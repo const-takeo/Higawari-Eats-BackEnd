@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-@ObjectType()
+@ObjectType() // schema, Graphql typeDef
 export class RestaurantEntity {
   @Field((type) => String)
   name: string;
