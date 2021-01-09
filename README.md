@@ -6,7 +6,8 @@
 
 ## Description
 The BackEnd of Higawari Eats.
-
+히가와리 이츠의 백엔드입니다.
+日替わりイーツのバックエンドです。
 
 ## Installation
 ```

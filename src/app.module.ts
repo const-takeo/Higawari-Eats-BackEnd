@@ -39,6 +39,5 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
     RestaurantsModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
