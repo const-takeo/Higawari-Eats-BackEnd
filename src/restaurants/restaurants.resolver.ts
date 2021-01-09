@@ -17,7 +17,9 @@ export class RestaurantsResolver {
   }
 
   @Mutation((type) => Boolean)
-  createRestaurants(@Args() createRestaurantDto: CreateRestaurantDto): boolean {
-    return true;
+  createRestaurants(
+    @Args() createRestaurantDto: CreateRestaurantDto,
+  ): Promise<boolean> {
+    return this.restaurantsService.createRestaurants(createRestaurantDto);
   }
 }
