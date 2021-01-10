@@ -25,7 +25,9 @@ export class RestaurantsResolver {
   }
 
   @Mutation((type) => Boolean)
-  updateRestaurant(@Args() updateRestaurantDto: UpdateRestaurantDto) {
-    return true;
+  updateRestaurant(
+    @Args() updateRestaurantDto: UpdateRestaurantDto,
+  ): Promise<boolean> {
+    return this.restaurantsService.updateRestaurant(updateRestaurantDto);
   }
 }
