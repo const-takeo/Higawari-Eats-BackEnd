@@ -3,9 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { UserModule } from './user/user.module';
+import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
-import { UserEntity } from './user/entities/user.entity';
+import { UserEntity } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { UserEntity } from './user/entities/user.entity';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
     }),
-    UserModule,
+    UsersModule,
     CommonModule,
   ],
   controllers: [],
