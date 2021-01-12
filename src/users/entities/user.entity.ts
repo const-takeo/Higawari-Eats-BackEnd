@@ -2,6 +2,7 @@ import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/common.entity';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 
@@ -46,7 +47,7 @@ export class UserEntity extends CoreEntity {
   // check the password
   async checkPassword(
     aPassword: string,
-  ): Promise<{ ok: boolean; error?: string; token?: string }> {
+  ): Promise<{ ok: boolean; error?: string }> {
     try {
       const result = await bcrypt.compare(aPassword, this.password);
       if (!result) {
@@ -57,7 +58,6 @@ export class UserEntity extends CoreEntity {
       }
       return {
         ok: true,
-        token: 'Just Test',
       };
     } catch (error) {
       return {

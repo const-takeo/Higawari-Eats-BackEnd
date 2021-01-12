@@ -15,7 +15,6 @@ The BackEnd of Higawari Eats.
   - id
   - createdAt
   - updatedAt
-
   - email
   - password
   - role( client | owner | delivery )
