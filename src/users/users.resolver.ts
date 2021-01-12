@@ -19,6 +19,7 @@ export class UsersResolver {
   createAccount(
     @Args('input') createAccountDto: CreateAccountInput,
   ): Promise<{ ok: boolean; error?: string }> {
+    console.log(createAccountDto);
     return this.usersService.createAccount(createAccountDto);
   }
 }
