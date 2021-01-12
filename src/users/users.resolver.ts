@@ -3,6 +3,7 @@ import {
   CreateAccountInput,
   CreateAccountOutPut,
 } from './dtos/create-accounts.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -19,7 +20,11 @@ export class UsersResolver {
   createAccount(
     @Args('input') createAccountDto: CreateAccountInput,
   ): Promise<{ ok: boolean; error?: string }> {
-    console.log(createAccountDto);
     return this.usersService.createAccount(createAccountDto);
+  }
+
+  @Mutation((type) => LoginOutput)
+  login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
+    return this.usersService.login(loginInput);
   }
 }

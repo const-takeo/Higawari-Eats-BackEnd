@@ -3,6 +3,7 @@ import { CoreEntity } from 'src/common/entities/common.entity';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
+import { IsEmail, IsEnum, IsString } from 'class-validator';
 
 enum UserRole {
   Client,
@@ -17,14 +18,17 @@ registerEnumType(UserRole, { name: 'UserRole' });
 export class UserEntity extends CoreEntity {
   @Column()
   @Field((type) => String)
+  @IsEmail()
   email: string;
 
   @Column()
   @Field((type) => String)
+  @IsString()
   password: string;
 
   @Column({ type: 'enum', enum: UserRole })
   @Field((type) => UserRole)
+  @IsEnum(UserRole)
   role: UserRole;
 
   //entityのクラスの中に作成する。非同期関数として作成
@@ -36,6 +40,30 @@ export class UserEntity extends CoreEntity {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
+    }
+  }
+
+  // check the password
+  async checkPassword(
+    aPassword: string,
+  ): Promise<{ ok: boolean; error?: string; token?: string }> {
+    try {
+      const result = await bcrypt.compare(aPassword, this.password);
+      if (!result) {
+        return {
+          ok: false,
+          error: 'Wrong Password',
+        };
+      }
+      return {
+        ok: true,
+        token: 'Just Test',
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
   }
 }
