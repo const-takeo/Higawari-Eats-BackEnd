@@ -27,4 +27,7 @@ export class UsersResolver {
   login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.usersService.login(loginInput);
   }
+
+  @Query((type) => UserEntity)
+  me() {}
 }
