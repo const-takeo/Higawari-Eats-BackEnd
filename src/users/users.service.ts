@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-accounts.dto';
 import { LoginInput } from './dtos/login.dto';
 import { UserEntity } from './entities/user.entity';
-import * as jwt from 'jsonwebtoken';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from 'src/jwt/jwt.service';
 
 @Injectable()
@@ -13,7 +11,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
-    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -61,10 +58,7 @@ export class UsersService {
           error: 'You Should Create a Account',
         };
       }
-      const token = jwt.sign(
-        { id: user.id },
-        this.configService.get('PRIVATE_KEY'),
-      );
+      const token = this.jwtService.sign(user.id);
       const { ok, error } = await user.checkPassword(password);
       if (ok) {
         return {
