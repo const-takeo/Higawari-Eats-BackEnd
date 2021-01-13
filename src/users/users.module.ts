@@ -7,5 +7,6 @@ import { UsersService } from './users.service';
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])], //Repositryの使用
   providers: [UsersResolver, UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

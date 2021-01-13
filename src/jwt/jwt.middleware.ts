@@ -1,17 +1,35 @@
-import { NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Response } from 'express';
+import { UsersService } from 'src/users/users.service';
+import { JwtService } from './jwt.service';
 
 // class type
-// export class JwtMiddleware implements NestMiddleware {
-//   // res , req, nextの順番が重要
-//   use(req: Request, res: Response, next: NextFunction) {
-//     console.log(req.headers);
-//     next();
-//   }
-// }
+@Injectable()
+export class JwtMiddleware implements NestMiddleware {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UsersService,
+  ) {}
+  // req , res, nextの順番が重要
+  async use(req: Request, res: Response, next: NextFunction) {
+    if ('x-jwt' in req.headers) {
+      const token = req.headers['x-jwt'];
+      const decode = this.jwtService.verify(String(token));
+      if (typeof decode === 'object' && decode.hasOwnProperty('id')) {
+        try {
+          const user = await this.userService.findById(decode['id']);
+          req['user'] = user; //requestにuserを入れて送る。
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    next(); //next handlerがuserをもらう。
+  }
+}
 
 // funtion type
-export function JwtMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(req.headers);
-  next();
-}
+// export function JwtMiddleware(req: Request, res: Response, next: NextFunction) {
+//   console.log(req.headers);
+//   next();
+// }
