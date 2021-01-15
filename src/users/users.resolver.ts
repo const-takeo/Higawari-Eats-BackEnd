@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import {
@@ -7,17 +7,13 @@ import {
   CreateAccountOutPut,
 } from './dtos/create-accounts.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @Resolver((type) => UserEntity)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
-
-  @Query((type) => String)
-  hello(): string {
-    return 'Hello';
-  }
 
   @Mutation((type) => CreateAccountOutPut)
   createAccount(
@@ -35,5 +31,13 @@ export class UsersResolver {
   @UseGuards(AuthGuard)
   me(@AuthUser() authUser: UserEntity) {
     return authUser;
+  }
+
+  @Query((type) => UserProfileOutput)
+  @UseGuards(AuthGuard)
+  async userProfile(
+    @Args('input') { id }: UserProfileInput,
+  ): Promise<UserProfileOutput> {
+    return await this.usersService.findById(id);
   }
 }

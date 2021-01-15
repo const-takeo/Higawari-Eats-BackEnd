@@ -76,7 +76,24 @@ export class UsersService {
   }
 
   // findById
-  async findById(id: number): Promise<UserEntity> {
-    return await this.usersRepository.findOne({ id });
+  async findById(
+    id: number,
+  ): Promise<{ user?: UserEntity; ok: boolean; error?: string }> {
+    try {
+      const user = await this.usersRepository.findOne({ id });
+      if (user !== undefined) {
+        return {
+          user,
+          ok: true,
+        };
+      } else {
+        throw Error();
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'User Not Found',
+      };
+    }
   }
 }
