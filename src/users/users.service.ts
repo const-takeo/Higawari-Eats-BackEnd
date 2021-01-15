@@ -61,10 +61,16 @@ export class UsersService {
       }
       const token = this.jwtService.sign(user.id);
       const { ok, error } = await user.checkPassword(password);
+      console.log(ok, error);
       if (ok) {
         return {
           ok,
           token,
+          error,
+        };
+      } else {
+        return {
+          ok,
           error,
         };
       }
@@ -102,17 +108,23 @@ export class UsersService {
   async editProfile(
     id: number,
     { email, password }: EditProfileInput,
-  ): Promise<{ ok: boolean; error?: string }> {
+  ): //editProfileInputをdestructuringを使ってemail,passwordを探そうとすると値がない時undefinedになってしまう。
+  //editProfileInputをobjectを投げてnullable状態にする。
+  Promise<{ ok: boolean; error?: string; user?: UserEntity }> {
     try {
-      await this.usersRepository.update(id, {
-        email,
-        password,
-      });
+      const findUser = await this.usersRepository.findOne(id);
+      if (email) {
+        findUser.email = email;
+      }
+      if (password) {
+        findUser.password = password;
+      }
+      const result = await this.usersRepository.save(findUser);
       return {
         ok: true,
+        user: result,
       };
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error,
