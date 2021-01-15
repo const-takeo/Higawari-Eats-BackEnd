@@ -6,6 +6,7 @@ import {
   CreateAccountInput,
   CreateAccountOutPut,
 } from './dtos/create-accounts.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { UserEntity } from './entities/user.entity';
@@ -39,5 +40,14 @@ export class UsersResolver {
     @Args('input') { id }: UserProfileInput,
   ): Promise<UserProfileOutput> {
     return await this.usersService.findById(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation((type) => EditProfileOutput)
+  async editProfile(
+    @AuthUser() { id }: UserEntity,
+    @Args('input') editProfileInput: EditProfileInput,
+  ): Promise<EditProfileOutput> {
+    return await this.usersService.editProfile(id, editProfileInput);
   }
 }

@@ -5,6 +5,7 @@ import { CreateAccountInput } from './dtos/create-accounts.dto';
 import { LoginInput } from './dtos/login.dto';
 import { UserEntity } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
+import { EditProfileInput } from './dtos/edit-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -93,6 +94,28 @@ export class UsersService {
       return {
         ok: false,
         error: 'User Not Found',
+      };
+    }
+  }
+
+  // editProfile
+  async editProfile(
+    id: number,
+    { email, password }: EditProfileInput,
+  ): Promise<{ ok: boolean; error?: string }> {
+    try {
+      await this.usersRepository.update(id, {
+        email,
+        password,
+      });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error,
       };
     }
   }

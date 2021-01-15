@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { MutationOutput } from 'src/common/dtos/output.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import { CoreEntity } from 'src/common/entities/common.entity';
 import { UserEntity } from '../entities/user.entity';
 
@@ -7,7 +7,7 @@ import { UserEntity } from '../entities/user.entity';
 export class UserProfileInput extends PickType(CoreEntity, ['id'], InputType) {}
 
 @ObjectType()
-export class UserProfileOutput extends MutationOutput {
+export class UserProfileOutput extends CoreOutput {
   @Field((type) => UserEntity, { nullable: true })
   user?: UserEntity;
 }
