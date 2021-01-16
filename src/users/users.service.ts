@@ -6,12 +6,15 @@ import { LoginInput } from './dtos/login.dto';
 import { UserEntity } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile.dto';
+import { Verification } from './entities/verification.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(Verification)
+    private readonly verificationRepository: Repository<Verification>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -22,7 +25,7 @@ export class UsersService {
     role,
   }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
     try {
-      console.log(email, { email });
+      // check
       const exists = await this.usersRepository.findOne({ email });
       if (exists) {
         return {
@@ -30,14 +33,20 @@ export class UsersService {
           error: 'Already Exists',
         };
       }
-      await this.usersRepository.save(
+      // create user
+      const user = await this.usersRepository.save(
         this.usersRepository.create({ email, password, role }),
+      );
+      // create verification
+      await this.verificationRepository.save(
+        this.verificationRepository.create({
+          user,
+        }),
       );
       return {
         ok: true,
       };
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error,
@@ -115,6 +124,12 @@ export class UsersService {
       const findUser = await this.usersRepository.findOne(id);
       if (email) {
         findUser.email = email;
+        findUser.verified = false;
+        await this.verificationRepository.save(
+          this.verificationRepository.create({
+            user: findUser,
+          }),
+        );
       }
       if (password) {
         findUser.password = password;
@@ -130,5 +145,18 @@ export class UsersService {
         error,
       };
     }
+  }
+
+  // verifyEmail
+  async verifyEmail(code: string): Promise<boolean> {
+    const verification = await this.verificationRepository.findOne(
+      { code },
+      { relations: ['user'] },
+    );
+    if (verification) {
+      verification.user.verified = true;
+      this.usersRepository.save(verification.user);
+    }
+    return false;
   }
 }
