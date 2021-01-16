@@ -31,6 +31,10 @@ export class UserEntity extends CoreEntity {
   @IsEnum(UserRole)
   role: UserRole;
 
+  @Column({ default: false })
+  @Field((type) => Boolean)
+  verified: boolean;
+
   //entityのクラスの中に作成する。非同期関数として作成
   // @BeforeInsert() <- Listenerを使用する。
   @BeforeInsert()
