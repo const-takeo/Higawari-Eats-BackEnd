@@ -20,7 +20,7 @@ export class UsersResolver {
   @Mutation((type) => CreateAccountOutPut)
   createAccount(
     @Args('input') createAccountDto: CreateAccountInput,
-  ): Promise<{ ok: boolean; error?: string }> {
+  ): Promise<CreateAccountOutPut> {
     return this.usersService.createAccount(createAccountDto);
   }
 
@@ -53,7 +53,7 @@ export class UsersResolver {
   }
 
   @Mutation((type) => VerifyEmailOutput)
-  verifyEmail(
+  async verifyEmail(
     @Args('input') { code }: VerifyEmailInput,
   ): Promise<VerifyEmailOutput> {
     return this.usersService.verifyEmail(code);

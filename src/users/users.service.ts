@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateAccountInput } from './dtos/create-accounts.dto';
-import { LoginInput } from './dtos/login.dto';
+import {
+  CreateAccountInput,
+  CreateAccountOutPut,
+} from './dtos/create-accounts.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserEntity } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
-import { EditProfileInput } from './dtos/edit-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
 import { VerifyEmailOutput } from './dtos/verify-email.dto';
+import { UserProfileOutput } from './dtos/user-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +28,7 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
+  }: CreateAccountInput): Promise<CreateAccountOutPut> {
     try {
       // check
       const exists = await this.usersRepository.findOne({ email });
@@ -56,10 +60,7 @@ export class UsersService {
   }
 
   // login
-  async login({
-    email,
-    password,
-  }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
+  async login({ email, password }: LoginInput): Promise<LoginOutput> {
     // check the user
     try {
       // Specifies what columns should be retrieved. <- select option
@@ -96,9 +97,7 @@ export class UsersService {
   }
 
   // findById
-  async findById(
-    id: number,
-  ): Promise<{ user?: UserEntity; ok: boolean; error?: string }> {
+  async findById(id: number): Promise<UserProfileOutput> {
     try {
       const user = await this.usersRepository.findOne({ id });
       if (user !== undefined) {
@@ -123,7 +122,7 @@ export class UsersService {
     { email, password }: EditProfileInput,
   ): //editProfileInputをdestructuringを使ってemail,passwordを探そうとすると値がない時undefinedになってしまう。
   //editProfileInputをobjectを投げてnullable状態にする。
-  Promise<{ ok: boolean; error?: string; user?: UserEntity }> {
+  Promise<EditProfileOutput> {
     try {
       const findUser = await this.usersRepository.findOne(id);
       if (email) {
