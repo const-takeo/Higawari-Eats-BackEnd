@@ -7,6 +7,7 @@ import { UserEntity } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
+import { VerifyEmailOutput } from './dtos/verify-email.dto';
 
 @Injectable()
 export class UsersService {
@@ -61,7 +62,11 @@ export class UsersService {
   }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
     // check the user
     try {
-      const user = await this.usersRepository.findOne({ email });
+      // Specifies what columns should be retrieved. <- select option
+      const user = await this.usersRepository.findOne(
+        { email },
+        { select: ['password', 'id'] },
+      );
       if (!user) {
         return {
           ok: false,
@@ -70,7 +75,6 @@ export class UsersService {
       }
       const token = this.jwtService.sign(user.id);
       const { ok, error } = await user.checkPassword(password);
-      console.log(ok, error);
       if (ok) {
         return {
           ok,
@@ -148,15 +152,25 @@ export class UsersService {
   }
 
   // verifyEmail
-  async verifyEmail(code: string): Promise<boolean> {
-    const verification = await this.verificationRepository.findOne(
-      { code },
-      { relations: ['user'] },
-    );
-    if (verification) {
-      verification.user.verified = true;
-      this.usersRepository.save(verification.user);
+  async verifyEmail(code: string): Promise<VerifyEmailOutput> {
+    try {
+      const verification = await this.verificationRepository.findOne(
+        { code },
+        // verification entityと関連付けられているuser entityを呼びます。
+        { relations: ['user'] },
+      );
+      if (verification) {
+        verification.user.verified = true;
+        this.usersRepository.save(verification.user);
+        return {
+          ok: true,
+        };
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
-    return false;
   }
 }

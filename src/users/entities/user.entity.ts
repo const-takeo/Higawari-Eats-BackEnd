@@ -21,7 +21,8 @@ export class UserEntity extends CoreEntity {
   @IsEmail()
   email: string;
 
-  @Column()
+  // optionのselectを使いpasswordが呼び出されるのを防止
+  @Column({ select: false })
   @Field((type) => String)
   @IsString()
   password: string;
@@ -40,11 +41,13 @@ export class UserEntity extends CoreEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassowrd(): Promise<void> {
-    try {
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
+    if (this.password) {
+      try {
+        this.password = await bcrypt.hash(this.password, 10);
+      } catch (error) {
+        console.log(error);
+        throw new InternalServerErrorException();
+      }
     }
   }
 

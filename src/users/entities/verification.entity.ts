@@ -13,7 +13,7 @@ export class Verification extends CoreEntity {
 
   //   OneToOne Relationship
   //JoinColumnを設定された側がrelation idを持つ。
-  @OneToOne((type) => UserEntity)
+  @OneToOne((type) => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: UserEntity;
 
@@ -21,6 +21,5 @@ export class Verification extends CoreEntity {
   @BeforeInsert()
   createCode() {
     this.code = uuidv4().replace(/-/g, '');
-    console.log(uuidv4().replace(/-/g, ''));
   }
 }
