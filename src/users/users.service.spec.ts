@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
+import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
@@ -21,10 +22,13 @@ const mockJwtService = {
 const mockMailService = {
   sendVerificationEmail: jest.fn(),
 };
+// mock repository of UserEntity
+type mockUsersRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 //jest
 describe('UsersService', () => {
   let service: UsersService;
+  let userRepository: mockUsersRepository<UserEntity>;
   // 全てをテストする前にモジュールを作る。
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -33,6 +37,7 @@ describe('UsersService', () => {
         UsersService,
         //mockRepository => typeOrmで本当のrepositoryを呼び出すのではなく偽物を作る。
         {
+          //repositoryの場合getRepositoryTokenを利用して誤魔化す
           provide: getRepositoryToken(UserEntity),
           useValue: mockRepository,
         },
@@ -51,13 +56,17 @@ describe('UsersService', () => {
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
+    userRepository = module.get(getRepositoryToken(UserEntity));
   });
 
   // 一つ目のテスト
   it('be defined', () => {
     expect(service).toBeDefined();
   });
-  it.todo('createAccount');
+  //
+  describe('createAccount', () => {
+    it('should be fail if user exists', () => {});
+  });
   it.todo('login');
   it.todo('findById');
   it.todo('editProfile');
