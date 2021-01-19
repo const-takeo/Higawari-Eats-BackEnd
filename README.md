@@ -25,3 +25,6 @@ The BackEnd of Higawari Eats.
   - See Profile
   - Edit Profile
   - Verify Email
+
+> ### Unit Test
+  - User

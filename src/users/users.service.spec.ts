@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { async } from 'rxjs';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
@@ -8,11 +9,11 @@ import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
 
 // fake functionを作る、mock function
-const mockRepository = {
+const mockRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
-};
+});
 // mock func of jwt
 const mockJwtService = {
   sign: jest.fn(),
@@ -39,11 +40,11 @@ describe('UsersService', () => {
         {
           //repositoryの場合getRepositoryTokenを利用して誤魔化す
           provide: getRepositoryToken(UserEntity),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: getRepositoryToken(Verification),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: JwtService,
@@ -65,7 +66,32 @@ describe('UsersService', () => {
   });
   //
   describe('createAccount', () => {
-    it('should be fail if user exists', () => {});
+    const createAccountArgs = {
+      email: 'mock@mock.com',
+      password: '1234',
+      role: 0,
+    };
+    //
+    it('should be fail if user exists', async () => {
+      userRepository.findOne.mockResolvedValue({
+        email: 'mock@mock.com',
+      });
+      const result = await service.createAccount(createAccountArgs);
+      expect(result).toMatchObject({
+        ok: false,
+        error: 'Already Exists',
+      });
+    });
+    it('should create a new user', async () => {
+      userRepository.findOne.mockResolvedValue(undefined);
+      userRepository.create.mockReturnValue(createAccountArgs);
+      userRepository.save.mockResolvedValue(createAccountArgs);
+      await service.createAccount(createAccountArgs);
+      expect(userRepository.create).toHaveBeenCalledTimes(1);
+      expect(userRepository.create).toHaveBeenCalledWith(createAccountArgs);
+      expect(userRepository.save).toHaveBeenCalledTimes(1);
+      expect(userRepository.save).toHaveBeenCalledWith(createAccountArgs);
+    });
   });
   it.todo('login');
   it.todo('findById');

@@ -42,7 +42,6 @@ export class MailService {
       console.log(error);
     }
   }
-
   sendVerificationEmail(email: string, code: string) {
     console.log(email, code);
     this.sendEmail('メールを認証して下さい。', 'verifty-email', [
