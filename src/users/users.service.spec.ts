@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { async } from 'rxjs';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
@@ -20,9 +19,9 @@ const mockJwtService = {
   verify: jest.fn(),
 };
 // mock func of mail
-const mockMailService = {
+const mockMailService = () => ({
   sendVerificationEmail: jest.fn(),
-};
+});
 // mock repository of UserEntity
 type mockUsersRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -30,6 +29,8 @@ type mockUsersRepository<T> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: mockUsersRepository<UserEntity>;
+  let verificationRepository: mockUsersRepository<Verification>;
+  let mailService: MailService;
   // 全てをテストする前にモジュールを作る。
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -52,12 +53,14 @@ describe('UsersService', () => {
         },
         {
           provide: MailService,
-          useValue: mockMailService,
+          useValue: mockMailService(),
         },
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
     userRepository = module.get(getRepositoryToken(UserEntity));
+    verificationRepository = module.get(getRepositoryToken(Verification));
+    mailService = module.get<MailService>(MailService);
   });
 
   // 一つ目のテスト
@@ -83,14 +86,45 @@ describe('UsersService', () => {
       });
     });
     it('should create a new user', async () => {
+      //user
       userRepository.findOne.mockResolvedValue(undefined);
       userRepository.create.mockReturnValue(createAccountArgs);
       userRepository.save.mockResolvedValue(createAccountArgs);
-      await service.createAccount(createAccountArgs);
+      //verification
+      //userだけ用いてインスタンスが生成される。→ return値にcodeは無い。
+      verificationRepository.create.mockReturnValue({
+        user: createAccountArgs,
+      });
+      verificationRepository.save.mockResolvedValue({
+        code: 'mockCode',
+        user: createAccountArgs,
+      });
+      //service
+      const result = await service.createAccount(createAccountArgs);
+      //user
       expect(userRepository.create).toHaveBeenCalledTimes(1);
       expect(userRepository.create).toHaveBeenCalledWith(createAccountArgs);
       expect(userRepository.save).toHaveBeenCalledTimes(1);
       expect(userRepository.save).toHaveBeenCalledWith(createAccountArgs);
+      //verification
+      expect(verificationRepository.create).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: createAccountArgs,
+      });
+      expect(verificationRepository.save).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.save).toHaveBeenCalledWith({
+        user: createAccountArgs,
+      });
+      //mail
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+      );
+      //service
+      expect(result).toMatchObject({
+        ok: true,
+      });
     });
   });
   it.todo('login');
