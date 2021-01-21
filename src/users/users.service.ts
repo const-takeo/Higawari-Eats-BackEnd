@@ -116,7 +116,6 @@ export class UsersService {
       };
     }
   }
-
   // editProfile
   async editProfile(
     id: number,

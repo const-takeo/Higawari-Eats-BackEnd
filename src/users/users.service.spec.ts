@@ -69,7 +69,7 @@ describe('UsersService', () => {
   it('be defined', () => {
     expect(service).toBeDefined();
   });
-  //
+  //createAccount
   describe('createAccount', () => {
     const createAccountArgs = {
       email: 'mock@mock.com',
@@ -138,6 +138,7 @@ describe('UsersService', () => {
       });
     });
   });
+  //login
   describe('login', () => {
     const loginArgs = {
       email: 'mock@email.com',
@@ -190,14 +191,41 @@ describe('UsersService', () => {
     it('should fail', async () => {
       userRepository.findOne.mockResolvedValue(new Error());
       const result = await service.login(loginArgs);
-      console.log(result);
       expect(result).toEqual({
         ok: false,
         error: expect.any(Error),
       });
     });
   });
-  it.todo('findById');
-  it.todo('editProfile');
+  //findById
+  describe('findById', () => {
+    it('should return user entity if user exist', async () => {
+      const findUserArgs = {
+        id: 1,
+      };
+      userRepository.findOne.mockResolvedValue(findUserArgs);
+      const result = await service.findById(1);
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(userRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
+      expect(result).toEqual({
+        user: findUserArgs,
+        ok: true,
+      });
+    });
+    //
+    it('should fail if user not exist', async () => {
+      userRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.findById(1);
+      expect(result).toEqual({
+        ok: false,
+        error: 'User Not Found',
+      });
+    });
+  });
+  //editProfile
+  describe('editProfile', () => {
+      
+  });
+  //
   it.todo('verifyEmail');
 });
