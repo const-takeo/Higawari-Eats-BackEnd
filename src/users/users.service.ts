@@ -57,7 +57,7 @@ export class UsersService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: "Couldn't Create Account",
       };
     }
   }
@@ -77,20 +77,18 @@ export class UsersService {
           error: 'You Should Create a Account',
         };
       }
-      const token = this.jwtService.sign(user.id);
       const { ok, error } = await user.checkPassword(password);
-      if (ok) {
-        return {
-          ok,
-          token,
-          error,
-        };
-      } else {
+      if (!ok) {
         return {
           ok,
           error,
         };
       }
+      const token = this.jwtService.sign(user.id);
+      return {
+        ok,
+        token,
+      };
     } catch (error) {
       return {
         ok: false,
