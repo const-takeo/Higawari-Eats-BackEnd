@@ -12,6 +12,7 @@ const mockRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
+  delete: jest.fn(),
 });
 // mock func of jwt
 const mockJwtService = () => ({
@@ -214,7 +215,8 @@ describe('UsersService', () => {
     });
     //
     it('should fail if user not exist', async () => {
-      userRepository.findOne.mockRejectedValue(new Error());
+      // userRepository.findOne.mockRejectedValue(new Error());
+      userRepository.findOne.mockResolvedValue(Promise.resolve(undefined));
       const result = await service.findById(1);
       expect(result).toEqual({
         ok: false,
@@ -224,7 +226,51 @@ describe('UsersService', () => {
   });
   //editProfile
   describe('editProfile', () => {
-      
+    it('should change the email', async () => {
+      const editProfileArgs = {
+        id: 1,
+        args: { email: 'mock@mock.com' },
+      };
+      const mockUser = {
+        id: 1,
+        email: 'mock@test.com',
+        verified: true,
+      };
+      const newUser = {
+        id: 1,
+        verified: false,
+        email: editProfileArgs.args.email,
+      };
+      const mockVerification = {
+        code: 'mockCode',
+      };
+      userRepository.findOne.mockResolvedValue(mockUser);
+      verificationRepository.create.mockReturnValue(mockVerification);
+      verificationRepository.save.mockResolvedValue(mockVerification);
+
+      await service.editProfile(editProfileArgs.id, editProfileArgs.args);
+
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(userRepository.findOne).toHaveBeenCalledWith(editProfileArgs.id);
+
+      expect(verificationRepository.delete).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.delete).toHaveBeenCalledWith({
+        user: { id: editProfileArgs.id },
+      });
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: newUser,
+      });
+      expect(verificationRepository.save).toHaveBeenCalledWith(
+        mockVerification,
+      );
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        newUser.email,
+        mockVerification.code,
+      );
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+    });
+    //
+    it('should change the password', () => {});
   });
   //
   it.todo('verifyEmail');

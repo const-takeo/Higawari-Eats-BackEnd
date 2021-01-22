@@ -117,12 +117,12 @@ export class UsersService {
     }
   }
   // editProfile
+  //editProfileInputをdestructuringを使ってemail,passwordを探そうとすると値がない時undefinedになってしまう。
+  //editProfileInputをobjectを投げてnullable状態にする。
   async editProfile(
     id: number,
     { email, password }: EditProfileInput,
-  ): //editProfileInputをdestructuringを使ってemail,passwordを探そうとすると値がない時undefinedになってしまう。
-  //editProfileInputをobjectを投げてnullable状態にする。
-  Promise<EditProfileOutput> {
+  ): Promise<EditProfileOutput> {
     try {
       const findUser = await this.usersRepository.findOne(id);
       if (email) {
