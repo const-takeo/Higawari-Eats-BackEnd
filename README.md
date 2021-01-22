@@ -27,4 +27,5 @@ The BackEnd of Higawari Eats.
   - Verify Email
 
 > ### Unit Test
-  - User
+  - UserService
+  - JwtService
