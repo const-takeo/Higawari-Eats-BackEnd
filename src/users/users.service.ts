@@ -144,10 +144,9 @@ export class UsersService {
       if (password) {
         findUser.password = password;
       }
-      const result = await this.usersRepository.save(findUser);
+      await this.usersRepository.save(findUser);
       return {
         ok: true,
-        user: result,
       };
     } catch (error) {
       return {

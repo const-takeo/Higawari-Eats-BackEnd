@@ -15,6 +15,6 @@ export class EditProfileInput extends PartialType(
 
 @ObjectType()
 export class EditProfileOutput extends CoreOutput {
-  @Field((type) => UserEntity, { nullable: true })
-  user?: UserEntity;
+  // @Field((type) => UserEntity, { nullable: true })
+  // user?: UserEntity;
 }

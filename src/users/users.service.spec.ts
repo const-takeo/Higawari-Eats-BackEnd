@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { resolve } from 'path';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
@@ -270,7 +271,41 @@ describe('UsersService', () => {
       expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
     });
     //
-    it('should change the password', () => {});
+    it('should change the password', async () => {
+      const changePasswordArgs = {
+        id: 1,
+        password: '1234',
+      };
+      const passwordMockUser = {
+        password: changePasswordArgs.password,
+      };
+      userRepository.findOne.mockResolvedValue(passwordMockUser);
+      const result = await service.editProfile(
+        changePasswordArgs.id,
+        changePasswordArgs,
+      );
+      expect(userRepository.save).toHaveBeenCalledWith(passwordMockUser);
+      expect(userRepository.save).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        ok: true,
+      });
+    });
+    //
+    it('should return any error', async () => {
+      const editProfileArgs = {
+        id: 1,
+        args: { email: 'mock@mock.com' },
+      };
+      userRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.editProfile(
+        editProfileArgs.id,
+        editProfileArgs,
+      );
+      expect(result).toEqual({
+        ok: false,
+        error: expect.any(Error),
+      });
+    });
   });
   //
   it.todo('verifyEmail');
