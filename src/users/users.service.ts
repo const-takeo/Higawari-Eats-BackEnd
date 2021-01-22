@@ -166,11 +166,16 @@ export class UsersService {
       );
       if (verification) {
         verification.user.verified = true;
-        this.usersRepository.save(verification.user);
+        await this.usersRepository.save(verification.user);
+        await this.verificationRepository.delete(verification.id);
         return {
           ok: true,
         };
       }
+      return {
+        ok: false,
+        error: 'Verification not found',
+      };
     } catch (error) {
       return {
         ok: false,
