@@ -88,7 +88,7 @@ describe('MailService', () => {
       expect(formSpy).toHaveBeenCalledWith(`subject`, sendEmailArgs.subject);
       expect(formSpy).toHaveBeenCalledWith(`template`, sendEmailArgs.template);
       //
-
+      
       //
       expect(got.post).toHaveBeenCalledWith(
         `https://api.mailgun.net/v3/${TEST_DOMAIN}/messages`,
