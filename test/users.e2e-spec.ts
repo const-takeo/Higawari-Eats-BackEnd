@@ -5,6 +5,7 @@ import { getConnection, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Verification } from 'src/users/entities/verification.entity';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 //
@@ -21,6 +22,7 @@ describe('UserModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
   let userRepository: Repository<UserEntity>;
+  let verificationRepository: Repository<Verification>;
 
   beforeAll(async () => {
     //moduleを持っていると何かを持って来られる。
@@ -31,6 +33,9 @@ describe('UserModule (e2e)', () => {
     app = module.createNestApplication();
     userRepository = module.get<Repository<UserEntity>>(
       getRepositoryToken(UserEntity),
+    );
+    verificationRepository = module.get<Repository<Verification>>(
+      getRepositoryToken(Verification),
     );
     await app.init();
   });
@@ -350,5 +355,70 @@ describe('UserModule (e2e)', () => {
     });
     //
   });
-  it.todo('verifyEmail');
+  describe('verifyEmail', () => {
+    let verificationCode: string;
+    beforeAll(async () => {
+      const [verification] = await verificationRepository.find();
+      //verification codeを一個作り、emailを変更する時には削除して又新しいcodeを作る、なのでidは２になる。
+      console.log(verification);
+      verificationCode = verification.code;
+    });
+    //
+    it('should verify email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        mutation{
+          verifyEmail(input:{
+            code:"${verificationCode}"
+          }){
+            error
+            ok
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                verifyEmail: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail on wrong verification code', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        mutation{
+          verifyEmail(input:{
+            code:"wrongcode"
+          }){
+            error
+            ok
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                verifyEmail: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toBe('Verification not found');
+        });
+    });
+  });
 });
