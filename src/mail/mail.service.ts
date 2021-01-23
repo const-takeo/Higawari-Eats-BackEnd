@@ -10,11 +10,11 @@ export class MailService {
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {}
 
-  private async sendEmail(
+  async sendEmail(
     subject: string,
     template: string,
     emailVars: EmailVar[],
-  ) {
+  ): Promise<boolean> {
     // using form-data(npm i form-data)
     const form = new FormData();
     form.append('from', `日替わりイーツー <mailgun@${this.options.domain}>`);
@@ -25,10 +25,9 @@ export class MailService {
     emailVars.forEach((eVar) => form.append(`v:${eVar.key}`, `${eVar.value}`));
     // using got(npm i got) for request
     try {
-      const response = await got(
+      const response = await got.post(
         `https://api.mailgun.net/v3/${this.options.domain}/messages`,
         {
-          method: 'POST',
           headers: {
             Authorization: `Basic ${Buffer.from(
               `api:${this.options.apiKey}`,
@@ -37,13 +36,12 @@ export class MailService {
           body: form,
         },
       );
-      console.log(response.body);
+      return true;
     } catch (error) {
-      console.log(error);
+      return false;
     }
   }
   sendVerificationEmail(email: string, code: string) {
-    console.log(email, code);
     this.sendEmail('メールを認証して下さい。', 'verifty-email', [
       { key: 'code', value: code },
       { key: 'userName', value: email },
