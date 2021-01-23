@@ -3,7 +3,6 @@ import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { MailService } from './mail.service';
 import * as FormData from 'form-data';
 import got from 'got/dist/source';
-import { EmailVar } from './mail.interfaces';
 
 //got
 jest.mock('got');
@@ -71,7 +70,7 @@ describe('MailService', () => {
       const sendEmailArgs = {
         subject: 'メールを認証して下さい。',
         template: 'verifty-email',
-        emailVars: [],
+        emailVars: [{ key: 'code', value: 'something' }],
       };
       const result = await service.sendEmail(
         sendEmailArgs.subject,
@@ -79,7 +78,8 @@ describe('MailService', () => {
         sendEmailArgs.emailVars,
       );
       const formSpy = jest.spyOn(FormData.prototype, 'append');
-      expect(formSpy).toHaveBeenCalledTimes(4);
+      expect(formSpy).toHaveBeenCalled();
+      expect(formSpy).toHaveBeenCalledTimes(5);
       expect(formSpy).toHaveBeenCalledWith(
         'from',
         `日替わりイーツー <mailgun@${TEST_DOMAIN}>`,
@@ -88,7 +88,7 @@ describe('MailService', () => {
       expect(formSpy).toHaveBeenCalledWith(`subject`, sendEmailArgs.subject);
       expect(formSpy).toHaveBeenCalledWith(`template`, sendEmailArgs.template);
       //
-      
+
       //
       expect(got.post).toHaveBeenCalledWith(
         `https://api.mailgun.net/v3/${TEST_DOMAIN}/messages`,
