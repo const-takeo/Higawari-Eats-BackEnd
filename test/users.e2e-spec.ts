@@ -292,6 +292,63 @@ describe('UserModule (e2e)', () => {
         });
     });
   });
+  describe('editProfile', () => {
+    const NEW_EMAIL = 'e2e@edit.com';
+    it('should change the email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+          mutation{
+            editProfile(input:{
+              email: "${NEW_EMAIL}"
+            }){
+              ok
+              error
+            }
+          }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                editProfile: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should have new email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+      {
+        me{
+          email
+        }
+      }
+      `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                me: { email },
+              },
+            },
+          } = res;
+          expect(email).toEqual(NEW_EMAIL);
+        });
+    });
+    //
+  });
   it.todo('verifyEmail');
-  it.todo('editProfile');
 });
