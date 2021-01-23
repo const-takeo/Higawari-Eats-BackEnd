@@ -6,6 +6,11 @@ import * as request from 'supertest';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 //
+const TEST_USER = {
+  email: 'e2e@test.com',
+  password: '1234',
+};
+//
 jest.mock('got', () => {
   console.log('Jest fucking awesome');
   post: jest.fn();
@@ -13,6 +18,7 @@ jest.mock('got', () => {
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
+  let jwtToken: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +37,6 @@ describe('UserModule (e2e)', () => {
   //todo
   //testの順番を付けるのは重要。
   describe('createAccount', () => {
-    const TEST_EMAIL = 'e2e@test.com';
     it('should create account', () => {
       //supertestを用いてrequestをgraphqlに送る。
       //graphqlはpost requestの包み
@@ -41,8 +46,8 @@ describe('UserModule (e2e)', () => {
           query: `
           mutation{
             createAccount(input:{
-              email:"${TEST_EMAIL}"
-              password:"1234"
+              email:"${TEST_USER.email}"
+              password:"${TEST_USER.password}"
               role:Owner
             }){
               ok
@@ -65,8 +70,8 @@ describe('UserModule (e2e)', () => {
           query: `
           mutation{
             createAccount(input:{
-              email:"${TEST_EMAIL}"
-              password:"1234"
+              email:"${TEST_USER.email}"
+              password:"${TEST_USER.password}"
               role:Owner
             }){
               ok
@@ -83,8 +88,72 @@ describe('UserModule (e2e)', () => {
     });
   });
   //
+  describe('login', () => {
+    it('should login and take a token', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        mutation{
+          login(input:{
+            email:"${TEST_USER.email}"
+            password:"${TEST_USER.password}"
+          }){
+            error
+            ok
+            token
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                login: { ok, error, token },
+              },
+            },
+          } = res;
+          jwtToken = token;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(token).toEqual(expect.any(String));
+        });
+    });
+    it('should not be able to login', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        mutation{
+          login(input:{
+            email:"${TEST_USER.email}"
+            password:"papapa"
+          }){
+            error
+            ok
+            token
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                login: { ok, error, token },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toBe('Wrong Password');
+          expect(token).toEqual(null);
+        });
+    });
+  });
   it.todo('userProfile');
-  it.todo('login');
   it.todo('me');
   it.todo('verifyEmail');
   it.todo('editProfile');
