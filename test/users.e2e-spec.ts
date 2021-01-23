@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import * as request from 'supertest';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 //
@@ -12,20 +14,24 @@ const TEST_USER = {
 };
 //
 jest.mock('got', () => {
-  console.log('Jest fucking awesome');
   post: jest.fn();
 });
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
+  let userRepository: Repository<UserEntity>;
 
   beforeAll(async () => {
+    //moduleを持っていると何かを持って来られる。
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = module.createNestApplication();
+    userRepository = module.get<Repository<UserEntity>>(
+      getRepositoryToken(UserEntity),
+    );
     await app.init();
   });
   //test後閉じ無いとエラが起こる。
@@ -153,7 +159,87 @@ describe('UserModule (e2e)', () => {
         });
     });
   });
-  it.todo('userProfile');
+  //
+  describe('userProfile', () => {
+    //beforeAllの外に居なければなら無い。
+    let userId: number;
+    beforeAll(async () => {
+      const [user] = await userRepository.find();
+      userId = user.id;
+    });
+    it('should see a users profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+          {
+            userProfile(input:{
+              id:1
+            }){
+              error
+              ok
+              user{
+                id
+                verified
+              }
+            }
+          }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                userProfile: {
+                  ok,
+                  error,
+                  user: { id },
+                },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+          expect(id).toBe(userId);
+        });
+    });
+    it("should can't find users profile", () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+        {
+          userProfile(input:{
+            id:333
+          }){
+            error
+            ok
+            user{
+              id
+              verified
+            }
+          }
+        }
+      `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                userProfile: { ok, error },
+              },
+            },
+          } = res;
+          console.log(res.body);
+          expect(ok).toBe(false);
+          expect(error).toBe('User Not Found');
+        });
+    });
+  });
   it.todo('me');
   it.todo('verifyEmail');
   it.todo('editProfile');
