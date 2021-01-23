@@ -234,13 +234,64 @@ describe('UserModule (e2e)', () => {
               },
             },
           } = res;
-          console.log(res.body);
           expect(ok).toBe(false);
           expect(error).toBe('User Not Found');
         });
     });
   });
-  it.todo('me');
+  //
+  describe('me', () => {
+    it('should find my profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+        {
+          me{
+            email
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                me: { email },
+              },
+            },
+          } = res;
+          expect(email).toEqual(expect.any(String));
+        });
+    });
+    //
+    it("should can't find my profile", () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        {
+          me{
+            email
+          }
+        }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data,
+              errors: [{ message }],
+            },
+          } = res;
+          expect(data).toBe(null);
+          expect(message).toBe('Forbidden resource');
+        });
+    });
+  });
   it.todo('verifyEmail');
   it.todo('editProfile');
 });
