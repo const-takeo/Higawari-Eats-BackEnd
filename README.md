@@ -26,6 +26,12 @@ The BackEnd of Higawari Eats.
   - Edit Profile
   - Verify Email
 
+> ### Restaurant Model
+  - name
+  - category
+  - address
+  - coverImage
+
 > ### Unit Test
   - UserService
   - JwtService
