@@ -11,13 +11,16 @@
 The BackEnd of Higawari Eats.
 ```
 ## Constructure
-> ### User Model
+> ### Core Model
   - id
   - createdAt
   - updatedAt
+
+> ### User Model extends Core
   - email
   - password
   - role( client | owner | delivery )
+  - verified
 
 > ### User CRUD
   - Create Account
@@ -26,7 +29,7 @@ The BackEnd of Higawari Eats.
   - Edit Profile
   - Verify Email
 
-> ### Restaurant Model
+> ### Restaurant Model extends Core
   - name
   - category
   - address

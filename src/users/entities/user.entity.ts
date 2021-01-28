@@ -1,9 +1,15 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/common.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
+import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 
 enum UserRole {
   Client,
@@ -13,6 +19,7 @@ enum UserRole {
 
 registerEnumType(UserRole, { name: 'UserRole' });
 
+@InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class UserEntity extends CoreEntity {
@@ -36,6 +43,10 @@ export class UserEntity extends CoreEntity {
   @Field((type) => Boolean)
   @IsBoolean()
   verified: boolean;
+
+  @Field((type) => [RestaurantEntity])
+  @OneToMany((type) => RestaurantEntity, (restaurant) => restaurant.owner)
+  restaurants: RestaurantEntity[];
 
   //entityのクラスの中に作成する。非同期関数として作成
   // @BeforeInsert() <- Listenerを使用する。
