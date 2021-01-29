@@ -1,13 +1,16 @@
-import { InputType, ObjectType, OmitType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { RestaurantEntity } from '../entities/restaurant.entity';
 
 @InputType()
-export class CreateRestaurantInput extends OmitType(
+export class CreateRestaurantInput extends PickType(
   RestaurantEntity,
-  ['id', 'category', 'owner'],
+  ['address', 'name', 'coverImg'],
   InputType,
-) {}
+) {
+  @Field((type) => String)
+  categoryName: string;
+}
 
 @ObjectType()
 export class CreateRestaurantOutput extends CoreOutput {}

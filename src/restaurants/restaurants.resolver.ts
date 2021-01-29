@@ -11,8 +11,8 @@ import { RestaurantsService } from './restaurants.service';
 export class RestaurantsResolver {
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
-  @Mutation((type) => Boolean)
-  createRestaurants(
+  @Mutation((type) => CreateRestaurantOutput)
+  async createRestaurants(
     @AuthUser() authUser: UserEntity,
     @Args('input') createRestaurantInput: CreateRestaurantInput,
   ): Promise<CreateRestaurantOutput> {
