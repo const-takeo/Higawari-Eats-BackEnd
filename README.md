@@ -35,6 +35,16 @@ The BackEnd of Higawari Eats.
   - address
   - coverImage
 
+> ### Restaurant CRUD
+  - See Categories & Restaurants & Restaurant
+  - Create Restaurant
+  - Edit Restaurant
+  - Delete Restaurant
+
+  - Create Dish
+  - Delete Dish
+  - Edit Dish
+
 > ### Unit Test
   - UserService
   - JwtService

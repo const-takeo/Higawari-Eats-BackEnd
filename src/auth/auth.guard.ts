@@ -6,6 +6,7 @@ import { AllowedRoles } from './role.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  //reflectorはmetadataをget出来る。
   constructor(private readonly reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.get<AllowedRoles>(
