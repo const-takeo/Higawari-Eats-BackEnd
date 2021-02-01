@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.decorator';
 import {
   CreateAccountInput,
   CreateAccountOutPut,
@@ -30,12 +31,13 @@ export class UsersResolver {
   }
 
   @Query((type) => UserEntity)
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   me(@AuthUser() authUser: UserEntity) {
     return authUser;
   }
 
   @Query((type) => UserProfileOutput)
+  @Role(['Any'])
   @UseGuards(AuthGuard)
   async userProfile(
     @Args('input') { id }: UserProfileInput,
