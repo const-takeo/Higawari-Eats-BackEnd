@@ -49,9 +49,5 @@ The BackEnd of Higawari Eats.
   - UserService
   - JwtService
 
-  - [] test
+  - [ ] test
   - [x] test
-  - :white_check_mark kakao
-  - : white_check_mark kakao
-  :white_check_mark kakao
-  : white_check_mark kakao
