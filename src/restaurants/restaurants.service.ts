@@ -45,7 +45,6 @@ export class RestaurantsService {
         restaurantId: newRestaurant.id,
       };
     } catch (error) {
-      console.log(error);
       return {
         error: 'レストランを作れません。',
         ok: false,
@@ -133,7 +132,6 @@ export class RestaurantsService {
   }
   //
   //Categories
-  //
   async allCategories(): Promise<AllCategoriesOutput> {
     try {
       const categories = await this.categories.find();
@@ -147,5 +145,9 @@ export class RestaurantsService {
         error: 'カテゴリを読み取ることができませんでした',
       };
     }
+  }
+  //countRestaurant
+  async countRestaurant(category: CategoryEntity): Promise<number> {
+    return await this.restaurants.count({ category });
   }
 }

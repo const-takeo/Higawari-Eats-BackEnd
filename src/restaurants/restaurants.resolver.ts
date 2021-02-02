@@ -3,6 +3,7 @@ import {
   Args,
   Int,
   Mutation,
+  Parent,
   Query,
   ResolveField,
   Resolver,
@@ -72,7 +73,10 @@ export class CategoryResolver {
   //
   //Computed Field, Dynamic Field => DB(entity)に保存されない、resolverで計算して返すField
   @ResolveField((type) => Int)
-  restaurantCount(): number {}
+  restaurantCount(@Parent() category: CategoryEntity): Promise<number> {
+    console.log(category);
+    return this.restaurantService.countRestaurant(category);
+  }
   //
   @Query((type) => AllCategoriesOutput)
   allCategories(): Promise<AllCategoriesOutput> {

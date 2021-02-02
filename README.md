@@ -12,42 +12,41 @@ The BackEnd of Higawari Eats.
 ```
 ## Constructure
 > ### Core Model
-  - id
-  - createdAt
-  - updatedAt
+- [x] id
+- [x] createdAt
+- [x] updatedAt
 
 > ### User Model extends Core
-  - email
-  - password
-  - role( client | owner | delivery )
-  - verified
+- [x] email
+- [x] password
+- [x] role( client | owner | delivery )
+- [x] verified
 
 > ### User CRUD
-  - Create Account
-  - Log In
-  - See Profile
-  - Edit Profile
-  - Verify Email
+- [x] Create Account
+- [x] Log In
+- [x] See Profile
+- [x] Edit Profile
+- [x] Verify Email
 
 > ### Restaurant Model extends Core
-  - name
-  - category
-  - address
-  - coverImage
+- [x] name
+- [x] category
+- [x] address
+- [x] coverImage
 
 > ### Restaurant CRUD
-  - See Categories & Restaurants & Restaurant
-  - Create Restaurant
-  - Edit Restaurant
-  - Delete Restaurant
+- [ ] See Categories & Restaurants & Restaurant
+- [x] Create Restaurant
+- [x] Edit Restaurant
+- [x] Delete Restaurant
 
-  - Create Dish
-  - Delete Dish
-  - Edit Dish
+- [ ] Create Dish
+- [ ] Delete Dish
+- [ ] Edit Dish
 
 > ### Unit Test
-  - UserService
-  - JwtService
+- [x] UserService
+- [x] JwtService
 
-  - [ ] test
-  - [x] test
+  

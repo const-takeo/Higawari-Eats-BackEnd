@@ -23,7 +23,7 @@ export class CategoryEntity extends CoreEntity {
   @IsString()
   slug: string;
 
-  @Field((type) => [RestaurantEntity])
+  @Field((type) => [RestaurantEntity], { nullable: true })
   @OneToMany((type) => RestaurantEntity, (restaurant) => restaurant.category)
   restaurants: RestaurantEntity[];
 }
