@@ -7,6 +7,10 @@ import {
   CreateRestaurantOutput,
 } from './dtos/create-restaurant.dto';
 import {
+  DeleteRestaurantInput,
+  DeleteRestaurantOutput,
+} from './dtos/delete-restaurant.dto';
+import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
@@ -37,6 +41,7 @@ export class RestaurantsService {
       await this.restaurants.save(newRestaurant);
       return {
         ok: true,
+        restaurantId: newRestaurant.id,
       };
     } catch (error) {
       console.log(error);
@@ -92,6 +97,36 @@ export class RestaurantsService {
       return {
         ok: false,
         error: 'レストランの編集が出来ません',
+      };
+    }
+  }
+  //delete
+  async deleteRestaurant(
+    owner: UserEntity,
+    { restaurantId }: DeleteRestaurantInput,
+  ): Promise<DeleteRestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne(restaurantId);
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'レストランが見つかりません',
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        return {
+          ok: false,
+          error: '所有してないレストランは削除できません',
+        };
+      }
+      await this.restaurants.delete(restaurantId);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '削除できません',
       };
     }
   }

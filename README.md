@@ -48,3 +48,10 @@ The BackEnd of Higawari Eats.
 > ### Unit Test
   - UserService
   - JwtService
+
+  - [] test
+  - [x] test
+  - :white_check_mark kakao
+  - : white_check_mark kakao
+  :white_check_mark kakao
+  : white_check_mark kakao
