@@ -15,12 +15,14 @@ The BackEnd of Higawari Eats.
 - [x] id
 - [x] createdAt
 - [x] updatedAt
+<br></br>
 
 > ### User Model extends Core
 - [x] email
 - [x] password
 - [x] role( client | owner | delivery )
 - [x] verified
+<br></br>
 
 > ### User CRUD
 - [x] Create Account
@@ -28,12 +30,14 @@ The BackEnd of Higawari Eats.
 - [x] See Profile
 - [x] Edit Profile
 - [x] Verify Email
+<br></br>
 
 > ### Restaurant Model extends Core
 - [x] name
 - [x] category
 - [x] address
 - [x] coverImage
+<br></br>
 
 > ### Restaurant CRUD
 - [ ] See Categories & Restaurants & Restaurant
@@ -44,6 +48,7 @@ The BackEnd of Higawari Eats.
 - [ ] Create Dish
 - [ ] Delete Dish
 - [ ] Edit Dish
+<br></br>
 
 > ### Unit Test
 - [x] UserService

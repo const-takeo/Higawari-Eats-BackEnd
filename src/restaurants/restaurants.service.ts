@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -142,12 +143,37 @@ export class RestaurantsService {
     } catch (error) {
       return {
         ok: false,
-        error: 'カテゴリを読み取ることができませんでした',
+        error: 'カテゴリーを読み取ることができませんでした',
       };
     }
   }
   //countRestaurant
   async countRestaurant(category: CategoryEntity): Promise<number> {
     return await this.restaurants.count({ category });
+  }
+  //findCategoryBySlug
+  async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+    try {
+      //dbで必要なもの(関連付けられているentitiy)をロードするときは必ず明示する事。relation
+      const category = await this.categories.findOne(
+        { slug },
+        { relations: ['restaurants'] },
+      );
+      if (!category) {
+        return {
+          ok: false,
+          error: 'カテゴリーを見つかる事ができませんでした',
+        };
+      }
+      return {
+        ok: true,
+        category,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'カテゴリーを読み取ることができませんでした',
+      };
+    }
   }
 }
