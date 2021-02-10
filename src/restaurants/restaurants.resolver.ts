@@ -25,7 +25,12 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
+import {
+  SearchRestaurantInput,
+  SearchRestaurnatOutput,
+} from './dtos/search-restaurant.dto';
 import { CategoryEntity } from './entities/category.entity';
 import { RestaurantsService } from './restaurants.service';
 
@@ -73,7 +78,20 @@ export class RestaurantsResolver {
   ): Promise<RestaurantsOutput> {
     return this.restaurantsService.allRestaurants(restaurantsInput);
   }
-  //
+  //restaurant
+  @Query((type) => RestaurantOutput)
+  restaurant(
+    @Args('input') retaurantInput: RestaurantInput,
+  ): Promise<RestaurantOutput> {
+    return this.restaurantsService.findRestaurantById(retaurantInput);
+  }
+  //searchRestaurant by string
+  @Query((type) => SearchRestaurnatOutput)
+  searchRestaurant(
+    @Args('input') searchRestaurantInput: SearchRestaurantInput,
+  ): Promise<SearchRestaurnatOutput> {
+    return this.restaurantsService.searchRestaurant(searchRestaurantInput);
+  }
 }
 //
 @Resolver((of) => CategoryEntity)

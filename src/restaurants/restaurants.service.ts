@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Like, Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import {
@@ -16,7 +16,12 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
+import {
+  SearchRestaurantInput,
+  SearchRestaurnatOutput,
+} from './dtos/search-restaurant.dto';
 import { CategoryEntity } from './entities/category.entity';
 import { RestaurantEntity } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
@@ -208,6 +213,57 @@ export class RestaurantsService {
       return {
         ok: false,
         error: 'レソトランを読み取る事に失敗しました。',
+      };
+    }
+  }
+  //findRestaurantById
+  async findRestaurantById({
+    restaurantId,
+  }: RestaurantInput): Promise<RestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne(restaurantId);
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'レストランを見つかる事ができませんでした。',
+        };
+      }
+      return {
+        ok: true,
+        restaurant,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'レストランを見つかる事ができませんでした。',
+      };
+    }
+  }
+  //
+  async searchRestaurant({
+    query,
+    page,
+  }: SearchRestaurantInput): Promise<SearchRestaurnatOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        where: {
+          // name: Like(`%${query}%`),
+          name: Raw((name) => `${name} ILIKE '%${query}%'`),
+        },
+        //make function for pagination after complete this project
+        skip: (page - 1) * 25,
+        take: 25,
+      });
+      return {
+        ok: true,
+        restaurants,
+        totalPages: Math.ceil(totalResults / 25),
+        totalResults,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'レストランを見つかる事ができませんでした。',
       };
     }
   }
