@@ -152,22 +152,35 @@ export class RestaurantsService {
     return await this.restaurants.count({ category });
   }
   //findCategoryBySlug
-  async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+  async findCategoryBySlug({
+    slug,
+    page,
+  }: CategoryInput): Promise<CategoryOutput> {
     try {
       //dbで必要なもの(関連付けられているentitiy)をロードするときは必ず明示する事。relation
-      const category = await this.categories.findOne(
-        { slug },
-        { relations: ['restaurants'] },
-      );
+      //{ relations: ['restaurants'] }, 関連付けてロードする事はできるが数が多い場合DBにものすごい負担が掛かる
+      // => paginationを作る
+      const category = await this.categories.findOne({ slug });
       if (!category) {
         return {
           ok: false,
           error: 'カテゴリーを見つかる事ができませんでした',
         };
       }
+      //pagination
+      const restaurants = await this.restaurants.find({
+        where: {
+          category,
+        },
+        take: 25,
+        skip: (page - 1) * 25,
+      });
+      category.restaurants = restaurants;
+      const totalResults = await this.countRestaurant(category);
       return {
         ok: true,
         category,
+        totalPages: Math.ceil(totalResults / 25),
       };
     } catch (error) {
       return {

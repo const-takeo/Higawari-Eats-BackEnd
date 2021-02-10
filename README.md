@@ -40,7 +40,7 @@ The BackEnd of Higawari Eats.
 <br></br>
 
 > ### Restaurant CRUD
-- [ ] See Categories & Restaurants & Restaurant
+- [x] See Categories & Restaurants & Restaurant
 - [x] Create Restaurant
 - [x] Edit Restaurant
 - [x] Delete Restaurant
