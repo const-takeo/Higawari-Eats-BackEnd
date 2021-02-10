@@ -35,6 +35,7 @@ The BackEnd of Higawari Eats.
 > ### Restaurant Model extends Core
 - [x] name
 - [x] category
+- [x] pagination
 - [x] address
 - [x] coverImage
 <br></br>

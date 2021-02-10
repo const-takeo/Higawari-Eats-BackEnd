@@ -16,6 +16,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { CategoryEntity } from './entities/category.entity';
 import { RestaurantEntity } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
@@ -180,12 +181,33 @@ export class RestaurantsService {
       return {
         ok: true,
         category,
+        restaurants,
         totalPages: Math.ceil(totalResults / 25),
       };
     } catch (error) {
       return {
         ok: false,
         error: 'カテゴリーを読み取ることができませんでした',
+      };
+    }
+  }
+  //allRestaurants
+  async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        skip: (page - 1) * 25,
+        take: 25,
+      });
+      return {
+        ok: true,
+        results: restaurants,
+        totalPages: Math.ceil(totalResults / 25),
+        totalResults,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'レソトランを読み取る事に失敗しました。',
       };
     }
   }
