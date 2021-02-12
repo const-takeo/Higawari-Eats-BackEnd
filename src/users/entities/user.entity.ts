@@ -12,7 +12,7 @@ import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 
 export enum UserRole {
-  Client = 'Client',
+  Client = '高客',
   Owner = 'Owner',
   Delivery = 'Delivery',
 }

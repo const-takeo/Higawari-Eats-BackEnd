@@ -4,6 +4,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { Like, Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -23,6 +24,7 @@ import {
   SearchRestaurnatOutput,
 } from './dtos/search-restaurant.dto';
 import { CategoryEntity } from './entities/category.entity';
+import { DishEntity } from './entities/dish.entity';
 import { RestaurantEntity } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
 
@@ -31,6 +33,8 @@ export class RestaurantsService {
   constructor(
     @InjectRepository(RestaurantEntity)
     private readonly restaurants: Repository<RestaurantEntity>,
+    @InjectRepository(DishEntity)
+    private readonly dishes: Repository<DishEntity>,
     private readonly categories: CategoryRepository,
   ) {}
 
@@ -221,7 +225,10 @@ export class RestaurantsService {
     restaurantId,
   }: RestaurantInput): Promise<RestaurantOutput> {
     try {
-      const restaurant = await this.restaurants.findOne(restaurantId);
+      //idでレストランを読み取る時メニューも一緒に読み取らなければならない。
+      const restaurant = await this.restaurants.findOne(restaurantId, {
+        relations: ['menu'],
+      });
       if (!restaurant) {
         return {
           ok: false,
@@ -264,6 +271,42 @@ export class RestaurantsService {
       return {
         ok: false,
         error: 'レストランを見つかる事ができませんでした。',
+      };
+    }
+  }
+  //createDish
+  async createDish(
+    owner: UserEntity,
+    createDishInput: CreateDishInput,
+  ): Promise<CreateDishOutput> {
+    const restaurant = await this.restaurants.findOne(
+      createDishInput.restaunrantId,
+    );
+    try {
+      //defensive programming!!!!!!
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'レストランを見つかる事ができませんでした。',
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        return {
+          ok: false,
+          error: '変更出来ません。',
+        };
+      }
+      await this.dishes.save(
+        this.dishes.create({ ...createDishInput, restaurant }),
+      );
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: 'メニューをつくろ事が出来ません',
       };
     }
   }
