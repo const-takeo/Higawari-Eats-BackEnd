@@ -9,10 +9,12 @@ import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
 } from './dtos/create-restaurant.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
 import {
   DeleteRestaurantInput,
   DeleteRestaurantOutput,
 } from './dtos/delete-restaurant.dto';
+import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
 import {
   EditRestaurantInput,
   EditRestaurantOutput,
@@ -307,6 +309,80 @@ export class RestaurantsService {
       return {
         ok: false,
         error: 'メニューをつくろ事が出来ません',
+      };
+    }
+  }
+  //editDish
+  async editDish(
+    owner: UserEntity,
+    editDishInput: EditDishInput,
+  ): Promise<EditDishOutput> {
+    try {
+      //dishはレストランを持っているがrelationsをロードしてくれなきゃダメです。
+      const dish = await this.dishes.findOne(editDishInput.dishId, {
+        relations: ['restaurant'],
+      });
+      //dont forget defensive programming!!
+      if (!dish) {
+        return {
+          ok: false,
+          error: 'メニューを探す事が出来ませんでした',
+        };
+      }
+      //ownerが一緒なのか確認
+      //restaurantのownerIdを持ってくるのでrelationが必要
+      if (dish.restaurant.ownerId !== owner.id) {
+        return {
+          ok: false,
+          error: '所有してないレストランのメニューを削除する事は出来ません',
+        };
+      }
+      //save functionはidを渡すとentityをupdateしてくれる。
+      await this.dishes.save([{ id: editDishInput.dishId, ...editDishInput }]);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'メニューを削除する事が出来ませんでした。',
+      };
+    }
+  }
+
+  //deleteDish
+  async deleteDish(
+    owner: UserEntity,
+    { dishId }: DeleteDishInput,
+  ): Promise<DeleteDishOutput> {
+    try {
+      //dishはレストランを持っているがrelationsをロードしてくれなきゃダメです。
+      const dish = await this.dishes.findOne(dishId, {
+        relations: ['restaurant'],
+      });
+      //dont forget defensive programming!!
+      if (!dish) {
+        return {
+          ok: false,
+          error: 'メニューを探す事が出来ませんでした',
+        };
+      }
+      //ownerが一緒なのか確認
+      //restaurantのownerIdを持ってくるのでrelationが必要
+      if (dish.restaurant.ownerId !== owner.id) {
+        return {
+          ok: false,
+          error: '所有してないレストランのメニューを削除する事は出来ません',
+        };
+      }
+      await this.dishes.delete(dishId);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'メニューを削除する事が出来ませんでした。',
       };
     }
   }
