@@ -24,46 +24,69 @@ export class OrderService {
     customer: UserEntity,
     { restaurantId, items }: CreateOrderInput,
   ): Promise<CreateOrderOutput> {
-    const restaurant = this.restaurants.findOne(restaurantId);
-    if (!restaurant) {
-      return {
-        ok: false,
-        error: 'レストランを見つかる事ができませんでした。',
-      };
-    }
-    //forEachの中ではreturn出来ない、→　error処理がちゃんと出来ない　→　createOrderは止まらない
-    //instead use for...of
-    for (const item of items) {
-      const dish = await this.dishes.findOne(item.dishId);
-      if (!dish) {
+    try {
+      const restaurant = await this.restaurants.findOne(restaurantId);
+      if (!restaurant) {
         return {
           ok: false,
-          error: 'メニューが存在しません',
+          error: 'レストランを見つかる事ができませんでした。',
         };
       }
-      console.log(dish.price);
-      for (const itemOption of item.options) {
-        const dishOption = dish.options.find(
-          (dishOption) => dishOption.name === itemOption.name,
-        );
-        if (dishOption) {
-          if (dishOption.extra) {
-            console.log(dishOption.extra);
-          } else {
-            const dishOptionChoice = dishOption.choices.find(
-              (optionChoice) => optionChoice.name === itemOption.choice,
-            );
-            if (dishOptionChoice.extra) {
-              console.log(dishOptionChoice.extra);
+      let orderFinalPrice = 0;
+      const orderItems: OrderItem[] = [];
+      //forEachの中ではreturn出来ない、→　error処理がちゃんと出来ない　→　createOrderは止まらない
+      //instead use for...of
+      for (const item of items) {
+        const dish = await this.dishes.findOne(item.dishId);
+        if (!dish) {
+          return {
+            ok: false,
+            error: 'メニューが存在しません',
+          };
+        }
+        //base price
+        let dishFinalPrice = dish.price;
+        for (const itemOption of item.options) {
+          const dishOption = dish.options.find(
+            (dishOption) => dishOption.name === itemOption.name,
+          );
+          if (dishOption) {
+            if (dishOption.extra) {
+              dishFinalPrice = dishFinalPrice + dishOption.extra;
+            } else {
+              const dishOptionChoice = dishOption.choices.find(
+                (optionChoice) => optionChoice.name === itemOption.choice,
+              );
+              if (dishOptionChoice) {
+                if (dishOptionChoice.extra) {
+                  dishFinalPrice = dishFinalPrice + dishOptionChoice.extra;
+                }
+              }
             }
           }
         }
+        orderFinalPrice += dishFinalPrice;
+        const orderItem = await this.orderItems.save(
+          this.orderItems.create({ dish, options: item.options }),
+        );
+        orderItems.push(orderItem);
       }
-      //   await this.orderItems.save(
-      //     this.orderItems.create({ dish, options: item.options }),
-      //   );
-      // }
-      // const order = await this.orders.save(this.orders.create({ customer }));
+      await this.orders.save(
+        this.orders.create({
+          customer,
+          restaurant,
+          total: orderFinalPrice,
+          items: orderItems,
+        }),
+      );
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '注文に失敗しました',
+      };
     }
   }
 }

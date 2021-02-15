@@ -58,7 +58,7 @@ export class OrderEntity extends CoreEntity {
   @Field((type) => Float, { nullable: true })
   @IsNumber()
   total?: number;
-  @Column({ type: 'enum', enum: OrderStatus })
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
   @Field((type) => OrderStatus)
   @IsEnum(OrderStatus)
   status: OrderStatus;
