@@ -41,10 +41,29 @@ export class OrderService {
           error: 'メニューが存在しません',
         };
       }
-      await this.orderItems.save(
-        this.orderItems.create({ dish, options: item.options }),
-      );
+      console.log(dish.price);
+      for (const itemOption of item.options) {
+        const dishOption = dish.options.find(
+          (dishOption) => dishOption.name === itemOption.name,
+        );
+        if (dishOption) {
+          if (dishOption.extra) {
+            console.log(dishOption.extra);
+          } else {
+            const dishOptionChoice = dishOption.choices.find(
+              (optionChoice) => optionChoice.name === itemOption.choice,
+            );
+            if (dishOptionChoice.extra) {
+              console.log(dishOptionChoice.extra);
+            }
+          }
+        }
+      }
+      //   await this.orderItems.save(
+      //     this.orderItems.create({ dish, options: item.options }),
+      //   );
+      // }
+      // const order = await this.orders.save(this.orders.create({ customer }));
     }
-    // const order = await this.orders.save(this.orders.create({ customer }));
   }
 }

@@ -13,9 +13,7 @@ export class OrderItemOption {
   @Field((type) => String)
   name: string;
   @Field((type) => String, { nullable: true })
-  choice?: string[];
-  @Field((type) => Int, { nullable: true })
-  extra?: number;
+  choice?: string;
 }
 
 @InputType('OrderItemInputType', { isAbstract: true })
