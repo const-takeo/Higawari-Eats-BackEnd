@@ -38,6 +38,7 @@ The BackEnd of Higawari Eats.
 - [x] pagination
 - [x] address
 - [x] coverImage
+
 <br></br>
 
 > ### Restaurant CRUD
@@ -57,6 +58,10 @@ The BackEnd of Higawari Eats.
 - [x] dishes
 - [x] total
 - [x] status
+
+> ### OrderCRUD
+- [x] createOrder
+- [ ] getOrder
 
 > ### OrderSubscriptions
 
