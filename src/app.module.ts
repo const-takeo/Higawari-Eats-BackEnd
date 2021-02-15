@@ -21,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
 import { DishEntity } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { OrderEntity } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-item.entity';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { OrderEntity } from './orders/entities/order.entity';
         CategoryEntity,
         DishEntity,
         OrderEntity,
+        OrderItem,
       ],
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
