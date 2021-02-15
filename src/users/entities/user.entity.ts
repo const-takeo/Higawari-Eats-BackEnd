@@ -13,7 +13,7 @@ import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
 
 export enum UserRole {
-  Client = '高客',
+  Client = 'Client',
   Owner = 'Owner',
   Delivery = 'Delivery',
 }
