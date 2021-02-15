@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
+import { OrderEntity } from 'src/orders/entities/order.entity';
 
 export enum UserRole {
   Client = '高客',
@@ -47,6 +48,14 @@ export class UserEntity extends CoreEntity {
   @Field((type) => [RestaurantEntity])
   @OneToMany((type) => RestaurantEntity, (restaurant) => restaurant.owner)
   restaurants: RestaurantEntity[];
+  //customer
+  @Field((type) => [OrderEntity])
+  @OneToMany((type) => OrderEntity, (order) => order.customer)
+  orders: OrderEntity[];
+  //driver
+  @Field((type) => [OrderEntity])
+  @OneToMany((type) => OrderEntity, (order) => order.driver)
+  rides: OrderEntity[];
 
   //entityのクラスの中に作成する。非同期関数として作成
   // @BeforeInsert() <- Listenerを使用する。

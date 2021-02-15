@@ -46,9 +46,21 @@ The BackEnd of Higawari Eats.
 - [x] Edit Restaurant
 - [x] Delete Restaurant
 
-- [ ] Create Dish
-- [ ] Delete Dish
-- [ ] Edit Dish
+- [x] Create Dish
+- [x] Delete Dish
+- [x] Edit Dish
+
+> ### OrderEntity
+- [x] customer
+- [x] restaurant
+- [x] driver
+- [x] dishes
+- [x] total
+- [x] status
+
+> ### OrderSubscriptions
+
+> ### Payment
 <br></br>
 
 > ### Unit Test
