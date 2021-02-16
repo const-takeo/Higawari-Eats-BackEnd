@@ -10,12 +10,20 @@ import { CoreEntity } from 'src/common/entities/common.entity';
 import { DishEntity } from 'src/restaurants/entities/dish.entity';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  RelationId,
+} from 'typeorm';
 import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
   COOKING = 'COOKING',
+  COOKED = 'COOCKED',
   PICKEDUP = 'PICKEDUP',
   DELIVERED = 'DELIVERED',
 }
@@ -40,6 +48,12 @@ export class OrderEntity extends CoreEntity {
     nullable: true,
   })
   restaurant?: RestaurantEntity;
+  //customerId
+  @RelationId((order: OrderEntity) => order.customer)
+  customerId: number;
+  //driverId
+  @RelationId((driver: OrderEntity) => driver.driver)
+  driverId: number;
   //driver
   @Field((type) => UserEntity, { nullable: true })
   @ManyToOne((type) => UserEntity, (drive) => drive.rides, {

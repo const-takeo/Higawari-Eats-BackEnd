@@ -42,7 +42,7 @@ export class RestaurantEntity extends CoreEntity {
   @Field((type) => [OrderEntity])
   @OneToMany((type) => OrderEntity, (orders) => orders.restaurant)
   orders: OrderEntity[];
-  //
+  //relationをロードしずにidを確認する事ができる。
   @RelationId((restaurant: RestaurantEntity) => restaurant.owner)
   ownerId: number;
 

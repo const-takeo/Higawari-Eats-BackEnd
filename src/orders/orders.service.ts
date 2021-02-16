@@ -5,9 +5,11 @@ import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity, UserRole } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
+import { EditOrderInput, EditOrderOutput } from './dtos/eidt-order.dto';
+import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
 import { OrderItem } from './entities/order-item.entity';
-import { OrderEntity } from './entities/order.entity';
+import { OrderEntity, OrderStatus } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
@@ -101,12 +103,14 @@ export class OrderService {
         orders = await this.orders.find({
           where: {
             customer: user,
+            ...(status && { status }),
           },
         });
       } else if (user.role === UserRole.Delivery) {
         orders = await this.orders.find({
           where: {
             driver: user,
+            ...(status && { status }),
           },
         });
       } else if (user.role === UserRole.Owner) {
@@ -117,6 +121,9 @@ export class OrderService {
           relations: ['orders'],
         });
         orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
+        if (status) {
+          orders = orders.filter((order) => order.status === status);
+        }
       }
       return {
         ok: true,
@@ -129,4 +136,106 @@ export class OrderService {
       };
     }
   }
+  allowedSee(user: UserEntity, order: OrderEntity): boolean {
+    let allowed = true;
+    if (user.role === UserRole.Client && user.id !== order.customerId) {
+      allowed = false;
+    }
+    if (user.role === UserRole.Delivery && user.id !== order.driverId) {
+      allowed = false;
+    }
+    if (user.role === UserRole.Owner && user.id !== order.restaurant.ownerId) {
+      allowed = false;
+    }
+    return allowed;
+  }
+
+  //getOrder
+  async getOrder(
+    user: UserEntity,
+    { id: orderId }: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    try {
+      const order = await this.orders.findOne(orderId, {
+        relations: ['restaurant'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: '注文を見つかる事ができませんでした',
+        };
+      }
+      if (!this.allowedSee(user, order)) {
+        return {
+          ok: false,
+          error: '権限がありません',
+        };
+      }
+      return {
+        ok: true,
+        order,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '注文を読み取る事に失敗しました',
+      };
+    }
+  }
+  //editOrder
+  async editOrder(
+    user: UserEntity,
+    { id: orderId, status }: EditOrderInput,
+  ): Promise<EditOrderOutput> {
+    try {
+      const order = await this.orders.findOne(orderId, {
+        relations: ['restaurant'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: '注文を見つかる事ができませんでした',
+        };
+      }
+      if (!this.allowedSee(user, order)) {
+        return {
+          ok: false,
+          error: '権限がありません',
+        };
+      }
+      let allowedEdit = true;
+      if (user.role === UserRole.Client) {
+        allowedEdit = false;
+      }
+      if (user.role === UserRole.Owner) {
+        if (status !== OrderStatus.COOKED && status !== OrderStatus.COOKING) {
+          allowedEdit = false;
+        }
+      }
+      if (user.role === UserRole.Delivery) {
+        if (
+          status !== OrderStatus.PICKEDUP &&
+          status !== OrderStatus.DELIVERED
+        ) {
+          allowedEdit = false;
+        }
+      }
+      if (!allowedEdit) {
+        return {
+          ok: false,
+          error: '権限がありません',
+        };
+      }
+      await this.orders.save([{ id: orderId, status }]);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '権限がありません',
+      };
+    }
+  }
+  //
 }
