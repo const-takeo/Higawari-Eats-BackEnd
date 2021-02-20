@@ -39,6 +39,7 @@
     "form-data": "^3.0.0",
     "got": "^11.8.1",
     "graphql": "^15.4.0",
+    "graphql-subscriptions": "^1.1.0",
     "graphql-tools": "^7.0.2",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
@@ -73,7 +74,7 @@
     "typescript": "^4.0.5"
   },
   "jest": {
-    "moduleNameMapper":{
+    "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     },
     "moduleFileExtensions": [
@@ -88,11 +89,10 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "coveragePathIgnorePatterns":[
+    "coveragePathIgnorePatterns": [
       "node_modules",
       ".entity.ts",
       ".constants.ts"
     ]
-
   }
 }

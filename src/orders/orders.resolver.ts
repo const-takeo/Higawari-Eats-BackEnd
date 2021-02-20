@@ -1,4 +1,5 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -8,6 +9,9 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrderService } from './orders.service';
+
+//graphql-subscription
+const pubsub = new PubSub();
 
 @Resolver((type) => OrderEntity)
 export class OrderResolver {
@@ -47,5 +51,15 @@ export class OrderResolver {
     @Args('input') getOrderInput: GetOrderInput,
   ): Promise<GetOrderOutput> {
     return this.ordersService.getOrder(user, getOrderInput);
+  }
+
+  //graphql subscription
+  //subscriptionはresolverでの変更された事やアップデートをlistenする。
+  //subscriptionはwebsocketを活性化させる必要がある。 => appModule => graphqlModule
+  @Subscription((type) => String)
+  orderSubscription() {
+    //pubsub => publish, subscribe
+    //triggerは俺が待っているanyイベント,名前はなんでもいい
+    return pubsub.asyncIterator('trigger');
   }
 }

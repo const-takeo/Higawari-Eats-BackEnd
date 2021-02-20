@@ -26,10 +26,12 @@ export class RestaurantEntity extends CoreEntity {
   @IsString()
   coverImg: string;
 
+  // Eager relations are always loaded automatically when relation's owner entity is loaded using find* methods.
   @Field((type) => CategoryEntity, { nullable: true })
   @ManyToOne((type) => CategoryEntity, (category) => category.restaurants, {
     nullable: true,
     onDelete: 'SET NULL',
+    eager: true,
   })
   category: CategoryEntity;
 

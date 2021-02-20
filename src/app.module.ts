@@ -44,8 +44,15 @@ import { OrderItem } from './orders/entities/order-item.entity';
       }),
     }),
     GraphQLModule.forRoot({
+      // websocket
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      // websocketとhttp-requestは動く方法が違う
+      // websocketは連結されたらずっと連結されている。
+      context: ({ req }) => {
+        console.log(req);
+        return { user: req['user'] };
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
