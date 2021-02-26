@@ -64,9 +64,11 @@ export class OrderResolver {
   //mutation.. Queryはhttpで動く
   //subscriptionは　websocket上で動く。
   @Subscription((type) => String)
-  orderSubscription() {
+  @Role(['Any'])
+  orderSubscription(@AuthUser() user: UserEntity) {
     //pubsub => publish, subscribe
     //triggerは俺が待っているanyイベント,名前はなんでもいい
+    console.log(user);
     return pubsub.asyncIterator('trigger');
   }
 }

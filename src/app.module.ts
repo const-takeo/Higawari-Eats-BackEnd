@@ -52,10 +52,11 @@ import { OrderItem } from './orders/entities/order-item.entity';
       // websocketにはrequestがない-> connectionがある。
       // http requestは連結毎にtokenを送るが connectionは最初に一回だけ送ってずっと繋がっている。
       context: ({ req, connection }) => {
+        const TOKEN_KEY = 'x-jwt';
         if (req) {
-          return { user: req['user'] };
-        } else {
-          console.log(connection);
+          return { token: req.headers[TOKEN_KEY] };
+        } else if (connection) {
+          return { token: connection.context['X-JWT'] };
         }
       },
     }),
@@ -94,11 +95,4 @@ import { OrderItem } from './orders/entities/order-item.entity';
   ],
   controllers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.POST,
-    });
-  }
-}
+export class AppModule {}
