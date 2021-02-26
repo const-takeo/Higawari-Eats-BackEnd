@@ -1,7 +1,9 @@
+import { Inject } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
+import { PUB_SUB } from 'src/common/common.constants';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/eidt-order.dto';
@@ -10,12 +12,12 @@ import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
 import { OrderEntity } from './entities/order.entity';
 import { OrderService } from './orders.service';
 
-//graphql-subscription
-const pubsub = new PubSub();
-
 @Resolver((type) => OrderEntity)
 export class OrderResolver {
-  constructor(private readonly ordersService: OrderService) {}
+  constructor(
+    private readonly ordersService: OrderService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
   //createOrder
   @Mutation((type) => CreateOrderOutput)
   @Role(['Client'])
@@ -54,8 +56,8 @@ export class OrderResolver {
   }
 
   @Mutation((type) => Boolean)
-  potatoReady() {
-    pubsub.publish('trigger', { orderSubscription: 'Kakao talk~!' });
+  potatoReady(@Args('potatoId') potatoId: number) {
+    this.pubSub.publish('trigger', { orderSubscription: potatoId });
     return true;
   }
   //graphql subscription
@@ -63,12 +65,16 @@ export class OrderResolver {
   //subscriptionはwebsocketを活性化させる必要がある。 => appModule => graphqlModule
   //mutation.. Queryはhttpで動く
   //subscriptionは　websocket上で動く。
-  @Subscription((type) => String)
+  @Subscription((type) => String, {
+    filter: ({ orderSubscription }, { potatoId }) => {
+      console.log(orderSubscription, potatoId);
+      return orderSubscription === potatoId;
+    },
+  })
   @Role(['Any'])
-  orderSubscription(@AuthUser() user: UserEntity) {
+  orderSubscription(@Args('potatoId') potatoId: number) {
     //pubsub => publish, subscribe
     //triggerは俺が待っているanyイベント,名前はなんでもいい
-    console.log(user);
-    return pubsub.asyncIterator('trigger');
+    return this.pubSub.asyncIterator('trigger');
   }
 }

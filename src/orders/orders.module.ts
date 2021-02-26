@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from 'src/common/common.module';
 import { DishEntity } from 'src/restaurants/entities/dish.entity';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { OrderItem } from './entities/order-item.entity';

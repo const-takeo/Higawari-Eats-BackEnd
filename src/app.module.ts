@@ -22,6 +22,7 @@ import { DishEntity } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { OrderEntity } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { OrderItem } from './orders/entities/order-item.entity';
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
     }),
+    CommonModule,
     AuthModule,
     UsersModule,
     RestaurantsModule,
