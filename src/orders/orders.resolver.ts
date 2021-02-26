@@ -53,9 +53,16 @@ export class OrderResolver {
     return this.ordersService.getOrder(user, getOrderInput);
   }
 
+  @Mutation((type) => Boolean)
+  potatoReady() {
+    pubsub.publish('trigger', { orderSubscription: 'Kakao talk~!' });
+    return true;
+  }
   //graphql subscription
   //subscriptionはresolverでの変更された事やアップデートをlistenする。
   //subscriptionはwebsocketを活性化させる必要がある。 => appModule => graphqlModule
+  //mutation.. Queryはhttpで動く
+  //subscriptionは　websocket上で動く。
   @Subscription((type) => String)
   orderSubscription() {
     //pubsub => publish, subscribe

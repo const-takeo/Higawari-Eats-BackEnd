@@ -44,14 +44,19 @@ import { OrderItem } from './orders/entities/order-item.entity';
       }),
     }),
     GraphQLModule.forRoot({
-      // websocket
+      //サーバにwebsocket機能を持たせる。
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
       // websocketとhttp-requestは動く方法が違う
       // websocketは連結されたらずっと連結されている。
-      context: ({ req }) => {
-        console.log(req);
-        return { user: req['user'] };
+      // websocketにはrequestがない-> connectionがある。
+      // http requestは連結毎にtokenを送るが connectionは最初に一回だけ送ってずっと繋がっている。
+      context: ({ req, connection }) => {
+        if (req) {
+          return { user: req['user'] };
+        } else {
+          console.log(connection);
+        }
       },
     }),
     TypeOrmModule.forRoot({
