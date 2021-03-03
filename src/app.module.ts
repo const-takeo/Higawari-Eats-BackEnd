@@ -23,6 +23,8 @@ import { OrdersModule } from './orders/orders.module';
 import { OrderEntity } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -76,6 +78,7 @@ import { CommonModule } from './common/common.module';
         DishEntity,
         OrderEntity,
         OrderItem,
+        Payment,
       ],
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
@@ -94,6 +97,7 @@ import { CommonModule } from './common/common.module';
       domain: process.env.MAILGUN_DOMAIN,
       fromEmail: process.env.MAILGUN_EMAIL,
     }),
+    PaymentsModule,
   ],
   controllers: [],
 })

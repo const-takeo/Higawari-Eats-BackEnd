@@ -11,6 +11,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum UserRole {
   Client = 'Client',
@@ -56,6 +57,10 @@ export class UserEntity extends CoreEntity {
   @Field((type) => [OrderEntity])
   @OneToMany((type) => OrderEntity, (order) => order.driver)
   rides: OrderEntity[];
+  //payments
+  @Field((type) => [Payment])
+  @OneToMany((type) => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   //entityのクラスの中に作成する。非同期関数として作成
   // @BeforeInsert() <- Listenerを使用する。

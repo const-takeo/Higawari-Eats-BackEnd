@@ -15,6 +15,7 @@ import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/eidt-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
+import { TakeOrderInput, TakeOrderOutput } from './dtos/take-order.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderEntity, OrderStatus } from './entities/order.entity';
 
@@ -251,6 +252,40 @@ export class OrderService {
         }
       }
       await this.pubSub.publish(NEW_ORDER_UPDATES, { orderUpdates: newOrder });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '権限がありません',
+      };
+    }
+  }
+  //
+  async takeOrder(
+    driver: UserEntity,
+    { id: orderId }: TakeOrderInput,
+  ): Promise<TakeOrderOutput> {
+    try {
+      const order = await this.orders.findOne(orderId);
+      if (!order) {
+        return {
+          ok: false,
+          error: '注文を見つかる事ができませんでした。',
+        };
+      }
+      if (order.driver) {
+        return {
+          ok: false,
+          error: 'ドライバーが既に存在します。',
+        };
+      }
+      //存在すればorderidとdriverをupdateする。
+      await this.orders.save({ id: orderId, driver });
+      await this.pubSub.publish(NEW_ORDER_UPDATES, {
+        orderUpdates: { ...order, driver },
+      });
       return {
         ok: true,
       };
