@@ -1,30 +1,24 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { UsersModule } from './users/users.module';
-import { UserEntity } from './users/entities/user.entity';
-import { JwtModule } from './jwt/jwt.module';
-import { JwtMiddleware } from './jwt/jwt.middleware';
-import { Verification } from './users/entities/verification.entity';
-import { MailModule } from './mail/mail.module';
-import { RestaurantEntity } from './restaurants/entities/restaurant.entity';
-import { CategoryEntity } from './restaurants/entities/category.entity';
-import { RestaurantsModule } from './restaurants/restaurants.module';
 import { AuthModule } from './auth/auth.module';
-import { DishEntity } from './restaurants/entities/dish.entity';
-import { OrdersModule } from './orders/orders.module';
-import { OrderEntity } from './orders/entities/order.entity';
-import { OrderItem } from './orders/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
-import { PaymentsModule } from './payments/payments.module';
+import { JwtModule } from './jwt/jwt.module';
+import { MailModule } from './mail/mail.module';
+import { OrderItem } from './orders/entities/order-item.entity';
+import { OrderEntity } from './orders/entities/order.entity';
+import { OrdersModule } from './orders/orders.module';
 import { Payment } from './payments/entities/payment.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { CategoryEntity } from './restaurants/entities/category.entity';
+import { DishEntity } from './restaurants/entities/dish.entity';
+import { RestaurantEntity } from './restaurants/entities/restaurant.entity';
+import { RestaurantsModule } from './restaurants/restaurants.module';
+import { UserEntity } from './users/entities/user.entity';
+import { Verification } from './users/entities/verification.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
