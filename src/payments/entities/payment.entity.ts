@@ -1,6 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/common.entity';
-import { OrderEntity } from 'src/orders/entities/order.entity';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
@@ -9,9 +8,9 @@ import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 @ObjectType()
 @Entity()
 export class Payment extends CoreEntity {
-  @Field(() => Int)
+  @Field(() => String)
   @Column()
-  transactionId: number;
+  transactionId: string;
 
   @Field(() => UserEntity)
   @ManyToOne(() => UserEntity, (user) => user.payments)

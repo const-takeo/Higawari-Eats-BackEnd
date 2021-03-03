@@ -59,7 +59,7 @@ export class UserEntity extends CoreEntity {
   rides: OrderEntity[];
   //payments
   @Field((type) => [Payment])
-  @OneToMany((type) => Payment, (payment) => payment.user)
+  @OneToMany((type) => Payment, (payment) => payment.user, { eager: true })
   payments: Payment[];
 
   //entityのクラスの中に作成する。非同期関数として作成

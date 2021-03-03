@@ -1,4 +1,4 @@
-import { InputType, Int, PickType } from '@nestjs/graphql';
+import { InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Payment } from '../entities/payment.entity';
 
