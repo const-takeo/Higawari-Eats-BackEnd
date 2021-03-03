@@ -9,6 +9,7 @@ import {
 } from './dto/create-payment.dto';
 import { GetPaymentsOutput } from './dto/get-payments.dto';
 import { Payment } from './entities/payment.entity';
+import { Cron, Interval, Timeout } from '@nestjs/schedule';
 
 @Injectable()
 export class PaymentService {
@@ -71,4 +72,18 @@ export class PaymentService {
     }
   }
   //
+  @Cron('30 * * * * *')
+  checkForPayments() {
+    console.log('checking.............cron.....');
+  }
+
+  @Interval(5000)
+  checkForPaymentsI() {
+    console.log('checking.............interval.....');
+  }
+
+  @Timeout(2000)
+  afterStarts() {
+    console.log('checking..............TimeOut.....');
+  }
 }

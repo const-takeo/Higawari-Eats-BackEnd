@@ -19,9 +19,11 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { UserEntity } from './users/entities/user.entity';
 import { Verification } from './users/entities/verification.entity';
 import { UsersModule } from './users/users.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
