@@ -39,6 +39,7 @@ export class OrderEntity extends CoreEntity {
   @ManyToOne((type) => UserEntity, (customer) => customer.orders, {
     onDelete: 'SET NULL',
     nullable: true,
+    eager: true,
   })
   customer?: UserEntity;
   //restaurant
@@ -46,6 +47,7 @@ export class OrderEntity extends CoreEntity {
   @ManyToOne((type) => RestaurantEntity, (restaurant) => restaurant.orders, {
     onDelete: 'SET NULL',
     nullable: true,
+    eager: true,
   })
   restaurant?: RestaurantEntity;
   //customerId
@@ -59,12 +61,13 @@ export class OrderEntity extends CoreEntity {
   @ManyToOne((type) => UserEntity, (drive) => drive.rides, {
     onDelete: 'SET NULL',
     nullable: true,
+    eager: true,
   })
   driver: UserEntity;
   //dish
   //ManyToManyを使う場合は@JoinTableを使用 -> 所有している側に追加する。
   @Field((type) => [OrderItem])
-  @ManyToMany((type) => OrderItem)
+  @ManyToMany((type) => OrderItem, { eager: true })
   @JoinTable()
   items: OrderItem[];
   //total

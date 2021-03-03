@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PubSub } from 'graphql-subscriptions';
 import {
   NEW_COOKED_ORDER,
+  NEW_ORDER_UPDATES,
   NEW_PENDING_ORDER,
   PUB_SUB,
 } from 'src/common/common.constants';
@@ -58,7 +59,7 @@ export class OrderService {
         let dishFinalPrice = dish.price;
         for (const itemOption of item.options) {
           const dishOption = dish.options.find(
-            (dishOption) => dishOption.name === itemOption.name,
+            (dishes) => dishes.name === itemOption.name,
           );
           if (dishOption) {
             if (dishOption.extra) {
@@ -200,6 +201,8 @@ export class OrderService {
   ): Promise<EditOrderOutput> {
     try {
       const order = await this.orders.findOne(orderId, {
+        //use eager relationship
+        //restaurantをロードする度にrelationされているrelationshipを自動的にロードしてくれる。
         relations: ['restaurant'],
       });
       if (!order) {
@@ -239,13 +242,15 @@ export class OrderService {
       }
       //saveはupdate時全体のデータを送らない。
       await this.orders.save({ id: orderId, status });
+      const newOrder = { ...order, status };
       if (user.role === UserRole.Owner) {
         if (status === OrderStatus.COOKED) {
           await this.pubSub.publish(NEW_COOKED_ORDER, {
-            cookedOrders: { ...order, status },
+            cookedOrders: newOrder,
           });
         }
       }
+      await this.pubSub.publish(NEW_ORDER_UPDATES, { orderUpdates: newOrder });
       return {
         ok: true,
       };
