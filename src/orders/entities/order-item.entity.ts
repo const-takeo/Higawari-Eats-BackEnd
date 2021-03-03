@@ -24,7 +24,7 @@ export class OrderItem extends CoreEntity {
   @ManyToOne((type) => DishEntity, { nullable: true })
   dish: DishEntity;
 
-  @Field((type) => [DishOptions], { nullable: true })
+  @Field((type) => [OrderItemOption], { nullable: true })
   @Column({ type: 'json', nullable: true })
-  options?: DishOptions[];
+  options?: OrderItemOption[];
 }

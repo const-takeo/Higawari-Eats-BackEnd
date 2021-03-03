@@ -1,5 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PubSub } from 'graphql-subscriptions';
+import {
+  NEW_COOKED_ORDER,
+  NEW_PENDING_ORDER,
+  PUB_SUB,
+} from 'src/common/common.constants';
 import { DishEntity } from 'src/restaurants/entities/dish.entity';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity, UserRole } from 'src/users/entities/user.entity';
@@ -22,6 +28,7 @@ export class OrderService {
     private readonly orderItems: Repository<OrderItem>,
     @InjectRepository(DishEntity)
     private readonly dishes: Repository<DishEntity>,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
   async createOrder(
     customer: UserEntity,
@@ -74,7 +81,7 @@ export class OrderService {
         );
         orderItems.push(orderItem);
       }
-      await this.orders.save(
+      const order = await this.orders.save(
         this.orders.create({
           customer,
           restaurant,
@@ -82,6 +89,10 @@ export class OrderService {
           items: orderItems,
         }),
       );
+      //pulbishのpayloadを変更した場合resolver側も変更しなければならない。
+      await this.pubSub.publish(NEW_PENDING_ORDER, {
+        pendingOrders: { order, ownerId: restaurant.ownerId },
+      });
       return {
         ok: true,
       };
@@ -226,7 +237,15 @@ export class OrderService {
           error: '権限がありません',
         };
       }
-      await this.orders.save([{ id: orderId, status }]);
+      //saveはupdate時全体のデータを送らない。
+      await this.orders.save({ id: orderId, status });
+      if (user.role === UserRole.Owner) {
+        if (status === OrderStatus.COOKED) {
+          await this.pubSub.publish(NEW_COOKED_ORDER, {
+            cookedOrders: { ...order, status },
+          });
+        }
+      }
       return {
         ok: true,
       };

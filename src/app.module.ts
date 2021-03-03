@@ -57,7 +57,7 @@ import { CommonModule } from './common/common.module';
         if (req) {
           return { token: req.headers[TOKEN_KEY] };
         } else if (connection) {
-          return { token: connection.context['X-JWT'] };
+          return { token: connection.context['x-jwt'] };
         }
       },
     }),
