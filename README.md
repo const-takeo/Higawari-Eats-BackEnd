@@ -61,7 +61,7 @@ The BackEnd of Higawari Eats.
 
 > ### OrderCRUD
 - [x] createOrder
-- [ ] getOrder
+- [x] getOrder
 
 > ### OrderSubscriptions
 

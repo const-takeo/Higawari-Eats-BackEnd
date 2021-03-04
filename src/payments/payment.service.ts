@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import {
   CreatePaymentInput,
   CreatePaymentOutput,
@@ -46,6 +46,11 @@ export class PaymentService {
           restaurant,
         }),
       );
+      restaurant.isPromoted = true;
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      restaurant.promotedUntil = date;
+      this.restaurants.save(restaurant);
       return {
         ok: true,
       };
@@ -73,17 +78,28 @@ export class PaymentService {
   }
   //
   @Cron('30 * * * * *')
-  checkForPayments() {
-    console.log('checking.............cron.....');
+  async checkPromotedRestaurants() {
+    const restaurants = await this.restaurants.find({
+      isPromoted: true,
+      promotedUntil: LessThan(new Date()),
+      //typeORMのoperatorを使い現在の時間より数字が少ないものを探しだす。
+    });
+    console.log(restaurants);
+    restaurants.forEach(async (restaurant) => {
+      restaurant.isPromoted = false;
+      restaurant.promotedUntil = null;
+      await this.restaurants.save(restaurant);
+    });
   }
 
-  @Interval(5000)
-  checkForPaymentsI() {
-    console.log('checking.............interval.....');
-  }
-
-  @Timeout(2000)
-  afterStarts() {
-    console.log('checking..............TimeOut.....');
-  }
+  //
 }
+
+// * * * * * *
+// | | | | | |
+// | | | | | day of week
+// | | | | month
+// | | | day of month
+// | | hour
+// | minute
+// second (optional)
