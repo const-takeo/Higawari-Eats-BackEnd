@@ -20,6 +20,7 @@ import { UserEntity } from './users/entities/user.entity';
 import { Verification } from './users/entities/verification.entity';
 import { UsersModule } from './users/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       fromEmail: process.env.MAILGUN_EMAIL,
     }),
     PaymentsModule,
+    UploadsModule,
   ],
   controllers: [],
 })
