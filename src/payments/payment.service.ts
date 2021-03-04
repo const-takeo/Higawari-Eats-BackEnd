@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantEntity } from 'src/restaurants/entities/restaurant.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -9,7 +10,6 @@ import {
 } from './dto/create-payment.dto';
 import { GetPaymentsOutput } from './dto/get-payments.dto';
 import { Payment } from './entities/payment.entity';
-import { Cron, Interval, Timeout } from '@nestjs/schedule';
 
 @Injectable()
 export class PaymentService {
@@ -77,6 +77,14 @@ export class PaymentService {
     }
   }
   //
+  // * * * * * *
+  // | | | | | |
+  // | | | | | day of week
+  // | | | | month
+  // | | | day of month
+  // | | hour
+  // | minute
+  // second (optional)
   @Cron('30 * * * * *')
   async checkPromotedRestaurants() {
     const restaurants = await this.restaurants.find({
@@ -94,12 +102,3 @@ export class PaymentService {
 
   //
 }
-
-// * * * * * *
-// | | | | | |
-// | | | | | day of week
-// | | | | month
-// | | | day of month
-// | | hour
-// | minute
-// second (optional)
