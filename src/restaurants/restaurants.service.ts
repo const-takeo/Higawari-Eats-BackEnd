@@ -19,6 +19,10 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import {
+  MyRestaurantInput,
+  MyRestaurantOutput,
+} from './dtos/my-restaurant.dto';
 import { MyRestaurnatsOutput } from './dtos/my-restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
@@ -409,6 +413,35 @@ export class RestaurantsService {
       return {
         ok: true,
         restaurants,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '見つかる事ができませんでした',
+      };
+    }
+  }
+
+  //
+
+  async myRestaurant(
+    owner: UserEntity,
+    { id }: MyRestaurantInput,
+  ): Promise<MyRestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne(
+        { owner, id },
+        { relations: ['menu'] },
+      );
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: '見つかる事ができませんでした',
+        };
+      }
+      return {
+        ok: true,
+        restaurant,
       };
     } catch (error) {
       return {
