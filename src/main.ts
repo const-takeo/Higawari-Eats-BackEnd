@@ -8,6 +8,6 @@ async function bootstrap() {
   // app.use(JwtMiddleware);
   // localhost 3000 -request-> localhost 4000 acces denyを解決
   app.enableCors();
-  await app.listen(4000);
+  await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
