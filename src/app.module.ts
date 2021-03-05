@@ -46,6 +46,8 @@ import { UploadsModule } from './uploads/uploads.module';
       }),
     }),
     GraphQLModule.forRoot({
+      //serverにdeployされた時はplaygroundを使わない
+      playground: process.env.NODE_ENV !== 'prod',
       //サーバにwebsocket機能を持たせる。
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
