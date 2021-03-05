@@ -41,6 +41,8 @@ import { UploadsModule } from './uploads/uploads.module';
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN: Joi.string().required(),
         MAILGUN_EMAIL: Joi.string().required(),
+        AWS_S3_SECRET_KEY: Joi.string().required(),
+        AWS_S3_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
@@ -95,7 +97,10 @@ import { UploadsModule } from './uploads/uploads.module';
       fromEmail: process.env.MAILGUN_EMAIL,
     }),
     PaymentsModule,
-    UploadsModule,
+    UploadsModule.forRoot({
+      secretKey: process.env.AWS_S3_SECRET_KEY,
+      privateKey: process.env.AWS_S3_KEY,
+    }),
   ],
   controllers: [],
 })

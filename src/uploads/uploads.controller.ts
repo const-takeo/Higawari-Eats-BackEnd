@@ -1,11 +1,14 @@
 import {
   Controller,
+  Inject,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as AWS from 'aws-sdk';
+import { CONFIG_OPTIONS } from 'src/common/common.constants';
+import { UploadsModuleOptions } from './uploads.interfaces';
 
 //DONT FORGET THIS BUCKET NAME
 //bucketは最初に一回だけ作れば良い
@@ -14,13 +17,17 @@ const BUCKET_NAME = 'kimchinattobutaitameoishii';
 
 @Controller('uploads')
 export class UploadsController {
+  constructor(
+    @Inject(CONFIG_OPTIONS) private readonly options: UploadsModuleOptions,
+  ) {}
+
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file) {
     AWS.config.update({
       credentials: {
-        accessKeyId: 'AKIAWLYLM5Z3G2I3M4XG',
-        secretAccessKey: '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',
+        accessKeyId: this.options.privateKey,
+        secretAccessKey: this.options.secretKey,
       },
     });
     try {
