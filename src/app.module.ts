@@ -29,9 +29,9 @@ import { UploadsModule } from './uploads/uploads.module';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
       //サーバーにdeployする時envファイルを使わない。
-      ignoreEnvFile: process.env.NODE_ENV === 'prod',
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('dev', 'prod', 'test'),
+        NODE_ENV: Joi.string().valid('dev', 'production', 'test'),
         DB_HOST: Joi.string(),
         DB_PORT: Joi.string(),
         DB_USERNAME: Joi.string(),
@@ -47,7 +47,7 @@ import { UploadsModule } from './uploads/uploads.module';
     }),
     GraphQLModule.forRoot({
       //serverにdeployされた時はplaygroundを使わない
-      playground: process.env.NODE_ENV !== 'prod',
+      playground: process.env.NODE_ENV !== 'production',
       //サーバにwebsocket機能を持たせる。
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
@@ -85,9 +85,9 @@ import { UploadsModule } from './uploads/uploads.module';
         OrderItem,
         Payment,
       ],
-      synchronize: process.env.NODE_ENV !== 'prod',
+      synchronize: process.env.NODE_ENV !== 'production',
       logging:
-        process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
+        process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
     }),
     CommonModule,
     AuthModule,
