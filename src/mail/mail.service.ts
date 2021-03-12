@@ -34,7 +34,7 @@ export class MailService {
           <tr>
             <td>
                 <p><font size="5">ログイン後認証してください。</font></p>
-                <a href="http://localhost:3000/confirm?=${verifyCode}"><font size="6">認証を行う</font></a>
+                <a href="https://604b838836df8c0007bfded7--elegant-poincare-d6780c.netlify.app/confirm?=${verifyCode}"><font size="6">認証を行う</font></a>
             </td>
           </tr>
         </table>
