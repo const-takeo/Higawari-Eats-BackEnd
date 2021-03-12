@@ -87,7 +87,8 @@ import { UploadsModule } from './uploads/uploads.module';
       ],
       synchronize: process.env.NODE_ENV !== 'production',
       logging:
-        process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
+        process.env.NODE_ENV !== 'production' &&
+        process.env.NODE_ENV !== 'test',
     }),
     CommonModule,
     AuthModule,
