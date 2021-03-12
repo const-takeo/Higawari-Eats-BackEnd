@@ -10,8 +10,6 @@ export class MailService {
   ) {}
 
   sendVerificationEmail(email: string, verifyCode: string) {
-    console.log(email);
-    console.log(this.options.clientId);
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
