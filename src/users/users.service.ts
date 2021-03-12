@@ -28,7 +28,7 @@ export class UsersService {
   //create accounts
   async createAccount({
     email,
-    password, 
+    password,
     role,
   }: CreateAccountInput): Promise<CreateAccountOutPut> {
     try {
