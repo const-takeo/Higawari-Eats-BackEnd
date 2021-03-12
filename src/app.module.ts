@@ -99,9 +99,10 @@ import { UploadsModule } from './uploads/uploads.module';
       privateKey: process.env.PRIVATE_KEY,
     }),
     MailModule.forRoot({
-      apiKey: process.env.MAILGUN_API_KEY,
-      domain: process.env.MAILGUN_DOMAIN,
-      fromEmail: process.env.MAILGUN_EMAIL,
+      client: process.env.MAILGUN_EMAIL,
+      clientId: process.env.GOOGLE_OAUTH_ID,
+      clientSecret: process.env.GOOGLE_OAUTH_SECRET_KEY,
+      refreshToken: process.env.GOOGLE_OAUTH_REFRESH_TOKEN,
     }),
     PaymentsModule,
     UploadsModule.forRoot({

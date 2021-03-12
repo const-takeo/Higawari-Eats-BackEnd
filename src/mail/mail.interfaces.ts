@@ -1,10 +1,19 @@
 export interface MailModuleOptions {
-  apiKey: string;
-  domain: string;
-  fromEmail: string;
+  client: string;
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
 }
 
 export interface EmailVar {
   key: string;
   value: string;
+}
+
+export interface AuthOptions {
+  type: string;
+  user: string;
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
 }
