@@ -35,7 +35,7 @@ export class UsersResolver {
   me(@AuthUser() authUser: UserEntity) {
     return authUser;
   }
-
+  
   @Query((type) => UserProfileOutput)
   @Role(['Any'])
   @UseGuards(AuthGuard)
