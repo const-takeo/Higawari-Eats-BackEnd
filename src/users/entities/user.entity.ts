@@ -46,6 +46,11 @@ export class UserEntity extends CoreEntity {
   @IsBoolean()
   verified: boolean;
 
+  @Column()
+  @Field((type) => String)
+  @IsString()
+  address: string;
+
   @Field((type) => [RestaurantEntity])
   @OneToMany((type) => RestaurantEntity, (restaurant) => restaurant.owner)
   restaurants: RestaurantEntity[];
@@ -86,7 +91,7 @@ export class UserEntity extends CoreEntity {
       if (!result) {
         return {
           ok: false,
-          error: 'Wrong Password',
+          error: 'パスワードが違います。',
         };
       }
       return {

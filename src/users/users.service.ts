@@ -30,6 +30,7 @@ export class UsersService {
     email,
     password,
     role,
+    address,
   }: CreateAccountInput): Promise<CreateAccountOutPut> {
     try {
       // check
@@ -42,7 +43,7 @@ export class UsersService {
       }
       // create user
       const user = await this.usersRepository.save(
-        this.usersRepository.create({ email, password, role }),
+        this.usersRepository.create({ email, password, role, address }),
       );
       // create verification
       const verification = await this.verificationRepository.save(
